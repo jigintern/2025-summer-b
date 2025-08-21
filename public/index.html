@@ -20,10 +20,10 @@
       }
     </style>
     <script type="module">
-      const message = await fetch("/welcome-message")
-      document.querySelector("body").innerHTML = `<h1>${await message.text()}</h1>`
+      const message = await fetch("/welcome-message");
+      document.querySelector("body").innerHTML = `<h1>${await message
+        .text()}</h1>`;
     </script>
   </head>
-  <body>
-  </body>
+  <body></body>
 </html>
