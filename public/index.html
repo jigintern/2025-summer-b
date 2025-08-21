@@ -1,71 +1,17 @@
 <!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width">
-<title>DenoでシンプルなBBS</title>
-
-<script type=module>
-
-import { fetchJSON } from "https://js.sabae.cc/fetchJSON.js";
-
-const enc = (s) => {
-    s = s.replace(/&/g, "&amp;");
-    s = s.replace(/</g, "&lt;");
-    s = s.replace(/>/g, "&gt;");
-    s = s.replace(/\n/g, "<br>");
-    return s;
-};
-
-window.onload = async () => {
-    const data = await fetchJSON("api/list");
-    for (const d of data) {
-        const div = document.createElement("div");
-        div.className = "bbsitem";
-        div.innerHTML = `<span class=date>${enc(d.date)}</span> by <span class=name>${enc(d.name)}</span>
-            <div class=body>${enc(d.body)}</div>`
-        container.appendChild(div);
-    }
-
-    btn_write.onclick = async () => {
-        const item = {
-            name: inp_name.value,
-            body: inp_body.value,
-            date: new Date().toString()
-        };
-        if (await fetchJSON("api/add", item) == "ok") {
-            window.location.reload();
-        }
-    }
-};
-</script>
-
-<style>
-.bbsitem {
-    border-top: 1px solid gray;
-    margin: 1em;
-}
-.writebox {
-    border: 2px solid gray;
-    padding: 1em;
-    margin: 1em;
-}
-input, textarea {
-    width: 80%;
-}
-</style>
-
-<link rel="stylesheet" href="https://unpkg.com/sakura.css/css/sakura.css" type="text/css">
+<title>掲示板一覧</title>
 
 </head>
 
 <body>
-<h1>DenoでシンプルなBBS</h1>
-<div id=container></div>
+<h1>掲示板一覧</h1>
 
-<div class=writebox>
-    名前：<input type=text id=inp_name><br>
-    <textarea id=inp_body></textarea><br>
-    <button id=btn_write>書き込む</button>
-</div>
+<ul>
+  <li><a href="/bbs/1">掲示板1</a></li>
+  <li><a href="/bbs/2">掲示板2</a></li>
+  <li><a href="/bbs/3">掲示板3</a></li>
+</ul>
 
-<footer>App: CC BY <a href=https://fukuno.jig.jp/3169>@taisukef</a></footer>
 </body>
 
 </html>
