@@ -2,26 +2,24 @@ import { serveDir } from "jsr:@std/http/file-server";
 import newsList from "./public/news.json" with {type:"json"};
 
 Deno.serve(async (req) => {
-  const pathname = new URL(req.url).pathname;
-  console.log(pathname);
+	const pathname = new URL(req.url).pathname;
 
-  console.log(newsList);
-  if (req.method === "GET" && pathname === "/thread-titles") {
-    const shuffleArray = arr => arr.sort(() => Math.random() - Math.random());
+	if (req.method === "GET" && pathname === "/thread-titles") {
+		const shuffleArray = (arr) =>
+			arr.sort(() => Math.random() - Math.random());
 
-    const shuffled =  shuffleArray(newsList.titles);
-    console.log(shuffled);
+		const shuffled = shuffleArray(newsList.titles);
 
-    // listをJSONとして返す
-    return new Response(JSON.stringify([...shuffled].slice(5)), {
-      headers: { "Content-Type": "application/json" },
-    });
-  }
+		// listをJSONとして返す
+		return new Response(JSON.stringify([...shuffled].slice(5)), {
+			headers: { "Content-Type": "application/json" },
+		});
+	}
 
-  return serveDir(req, {
-    fsRoot: "public",
-    urlRoot: "",
-    showDirListing: true,
-    enableCors: true,
-  });
+	return serveDir(req, {
+		fsRoot: "public",
+		urlRoot: "",
+		showDirListing: true,
+		enableCors: true,
+	});
 });
