@@ -1,5 +1,5 @@
 import { serveDir } from "jsr:@std/http/file-server";
-import { UUID } from "uuidjs";
+import { UUID } from "npm:uuidjs";
 
 import newsList from "./public/news.json" with {type:"json"};
 
