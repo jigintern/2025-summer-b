@@ -65,11 +65,11 @@ Deno.serve(async (req: Request) => {
 			// keyが既に存在する場合は、更新
 			const selectedTitles: string[] = shuffled.slice(0, 5);
 
-			for await (const selectedTitle of selectedTitles) {
+			for (let i = 0; i < selectedTitles.length; i++) {
 				const threadUUID: string = UUID.generate();
 				objectList.push({
 					"uuid": threadUUID,
-					"title": selectedTitle,
+					"title": selectedTitles[i],
 					"summary": null,
 				});
 				await kv.set([newsUUID, threadUUID], objectList.at(-1));
