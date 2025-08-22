@@ -42,6 +42,13 @@ Deno.serve(async (req) => {
 		});
 	}
 
+    if (req.method === "GET" && pathname === "thread-posts") {
+        const threadId = new URL(req.url).searchParams.get("thread-id");
+        const kv = Deno.openKv();
+        return await kv.list({prefix: [threadId]});
+
+    }
+
 	return serveDir(req, {
 		fsRoot: "public",
 		urlRoot: "",
