@@ -3,7 +3,7 @@ import { UUID } from "npm:uuidjs";
 
 import newsList from "./public/news.json" with {type:"json"};
 
-Deno.serve(async (req) => {
+Deno.serve(async (req: Request) => {
 	const pathname: string = new URL(req.url).pathname;
 
 	if (req.method === "GET" && pathname === "/thread-titles") {
