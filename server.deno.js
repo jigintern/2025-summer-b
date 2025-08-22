@@ -1,7 +1,7 @@
 import { serveDir } from "jsr:@std/http/file-server";
 import { UUID } from "npm:uuidjs";
 
-import newsList from "./public/news.json" with { type: "json" };
+import newsList from "./public/data/news.json" with { type: "json" };
 
 Deno.serve(async (req) => {
     const pathname = new URL(req.url).pathname;

@@ -1,7 +1,8 @@
 import { serveDir } from "jsr:@std/http/file-server";
 import { UUID } from "npm:uuidjs";
 
-import newsList from "./public/news.json" with {type:"json"};
+import newsList from "./public/data/news.json" with {type:"json"};
+import samplePosts from "./public/data/samplePosts.json" with {type: "json"};
 
 type newspaperModel = {
 	"uuid": string;
@@ -109,6 +110,28 @@ Deno.serve(async (req: Request) => {
         headers: { "Content-Type": "application/json" },
     });
     }
+
+	// テスト会話データ作成用のAPI
+	if (req.method === "GET" && pathname === "/create-posts") {
+		const threadId: string | null = new URL(req.url).searchParams.get("thread-id");
+
+		if (!threadId) {
+            return new Response("Missing thread-id parameter", { status: 400 });
+        }
+		const kv: Deno.Kv = await Deno.openKv();
+
+		const posts: PostModel[] = <PostModel[]>samplePosts;
+
+		for (let i = 0; i < posts.length; i++){
+			await kv.set([threadId, i], {posts});
+		}
+
+		return new Response("create successful", {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+    });
+		
+	}
 
 	return serveDir(req, {
 		fsRoot: "public",
