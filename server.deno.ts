@@ -4,18 +4,18 @@ import { UUID } from "npm:uuidjs";
 import newsList from "./public/news.json" with {type:"json"};
 
 Deno.serve(async (req) => {
-	const pathname = new URL(req.url).pathname;
+	const pathname: string = new URL(req.url).pathname;
 
 	if (req.method === "GET" && pathname === "/thread-titles") {
-		const shuffleArray = (arr) =>
+		const shuffleArray = (arr: string[]) =>
 			arr.sort(() => Math.random() - Math.random());
 
-		const shuffled = shuffleArray(newsList.titles);
+		const shuffled: string[] = shuffleArray(newsList.titles);
 
 		// Deno KVにアクセス
-		const kv = await Deno.openKv();
+		const kv: Deno.Kv = await Deno.openKv();
 
-		const newsUUID = UUID.generate();
+		const newsUUID: string = UUID.generate();
 
 		await kv.set(["newspaper", newsUUID], {
 			"uuid": newsUUID,
@@ -26,9 +26,9 @@ Deno.serve(async (req) => {
 		// Deno KVに保存
 		// 第一引数はkey, 第二引数はvalue
 		// keyが既に存在する場合は、更新
-		const selectedTitles = shuffled.slice(5);
+		const selectedTitles: string[] = shuffled.slice(5);
 		for await (const news of selectedTitles) {
-			const threadUUID = UUID.generate();
+			const threadUUID: string = UUID.generate();
 			await kv.set([newsUUID, threadUUID], {
 				"uuid": threadUUID,
 				"title": news,
