@@ -15,6 +15,12 @@ type ThreadModel = {
 	"summary": string | null;
 };
 
+type PostModel = {
+	userName: string;
+	post: string;
+	createdAt: Date;
+}
+
 Deno.serve(async (req: Request) => {
 	const pathname: string = new URL(req.url).pathname;
 
@@ -81,6 +87,28 @@ Deno.serve(async (req: Request) => {
 			headers: { "Content-Type": "application/json" },
 		});
 	}
+
+	if (req.method === "GET" && pathname === "/thread-posts") {
+        const threadId: string | null = new URL(req.url).searchParams.get("thread-id");
+
+		if (!threadId) {
+            return new Response("Missing thread-id parameter", { status: 400 });
+        }
+
+		
+        const kv: Deno.Kv = await Deno.openKv();
+        const postList: Deno.KvListIterator<PostModel> = await kv.list({ prefix: [threadId] });
+
+		const threadPosts: PostModel[]  = []
+		for await(const post of postList) {
+			threadPosts.push(post.value);
+		}
+
+		return new Response(JSON.stringify(threadPosts), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+    });
+    }
 
 	return serveDir(req, {
 		fsRoot: "public",
