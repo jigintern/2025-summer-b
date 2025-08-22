@@ -3,6 +3,12 @@ import { UUID } from "npm:uuidjs";
 
 import newsList from "./public/news.json" with {type:"json"};
 
+type newpapersModel = {
+	"uuid": string;
+	"enable": boolean;
+	"createdAt": Date | null;
+};
+
 type ThreadModel = {
 	"uuid": string;
 	"title": string;
@@ -21,29 +27,60 @@ Deno.serve(async (req: Request) => {
 		// Deno KVにアクセス
 		const kv: Deno.Kv = await Deno.openKv();
 
-		const newsUUID: string = UUID.generate();
-
-		await kv.set(["newspaper", newsUUID], {
-			"uuid": newsUUID,
-			"enable": true,
-			"createdAt": null,
-		});
-
 		const objectList: ThreadModel[] = [];
 
-		// Deno KVに保存
-		// 第一引数はkey, 第二引数はvalue
-		// keyが既に存在する場合は、更新
-		const selectedTitles: string[] = shuffled.slice(5);
-		for await (const news of selectedTitles) {
-			const threadUUID: string = UUID.generate();
-			objectList.push({
-				"uuid": threadUUID,
-				"title": news,
-				"summary": null,
-			});
-			await kv.set([newsUUID, threadUUID], objectList.at(-1));
+		let newsUUID: string = "";
+
+		// list: 条件指定の取得
+		const newspapers: Deno.KvListIterator<newpapersModel> = kv.list({
+			prefix: ["newspaper"],
+		});
+
+		let enableIsTrue: boolean = true;
+		for await (const newspaper of newspapers) {
+			if (!newspaper.value.enable) {
+				enableIsTrue = false;
+				newsUUID = newspaper.value.uuid;
+				console.log(`${newsUUID}\n`);
+				break;
+			}
 		}
+		if (!enableIsTrue) {
+			console.log("!enableIsTrue\n");
+			const runningThreads: Deno.KvListIterator<ThreadModel> = kv.list({
+				prefix: [newsUUID],
+			});
+
+			for await (const runningThread of runningThreads) {
+				objectList.push(runningThread.value);
+				console.log("runningThread: ", runningThread);
+			}
+			console.log("\n");
+		}
+
+			else{
+			console.log("enableIsTrue\n");
+				newsUUID = UUID.generate();
+				await kv.set(["newspaper", newsUUID], {
+					"uuid": newsUUID,
+					"enable": false,
+					"createdAt": null,
+				});
+
+				// Deno KVに保存
+				// 第一引数はkey, 第二引数はvalue
+				// keyが既に存在する場合は、更新
+				const selectedTitles: string[] = shuffled.slice(5);
+				for await (const selectedTitle of selectedTitles) {
+					const threadUUID: string = UUID.generate();
+					objectList.push({
+						"uuid": threadUUID,
+						"title": selectedTitle,
+						"summary": null,
+					});
+					await kv.set([newsUUID, threadUUID], objectList.at(-1));
+				}
+			}
 
 		// listをJSONとして返す
 		return new Response(JSON.stringify(objectList), {
