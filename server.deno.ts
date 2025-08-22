@@ -35,7 +35,6 @@ Deno.serve(async (req: Request) => {
 		const newspapers: Deno.KvListIterator<newpapersModel> = kv.list({
 			prefix: ["newspaper"],
 		});
-		
 
 		let enableIsTrue: boolean = true;
 		for await (const newspaper of newspapers) {
@@ -53,31 +52,29 @@ Deno.serve(async (req: Request) => {
 			for await (const runningThread of runningThreads) {
 				objectList.push(runningThread.value);
 			}
-		}
+		} else {
+			newsUUID = UUID.generate();
+			await kv.set(["newspaper", newsUUID], {
+				"uuid": newsUUID,
+				"enable": false,
+				"createdAt": null,
+			});
 
-			else{
-				newsUUID = UUID.generate();
-				await kv.set(["newspaper", newsUUID], {
-					"uuid": newsUUID,
-					"enable": false,
-					"createdAt": null,
+			// Deno KVに保存
+			// 第一引数はkey, 第二引数はvalue
+			// keyが既に存在する場合は、更新
+			const selectedTitles: string[] = shuffled.slice(0, 5);
+
+			for await (const selectedTitle of selectedTitles) {
+				const threadUUID: string = UUID.generate();
+				objectList.push({
+					"uuid": threadUUID,
+					"title": selectedTitle,
+					"summary": null,
 				});
-
-				// Deno KVに保存
-				// 第一引数はkey, 第二引数はvalue
-				// keyが既に存在する場合は、更新
-				const selectedTitles: string[] = shuffled.slice(0,5);
-
-				for await (const selectedTitle of selectedTitles) {
-					const threadUUID: string = UUID.generate();
-					objectList.push({
-						"uuid": threadUUID,
-						"title": selectedTitle,
-						"summary": null,
-					});
-					await kv.set([newsUUID, threadUUID], objectList.at(-1));
-				}
+				await kv.set([newsUUID, threadUUID], objectList.at(-1));
 			}
+		}
 
 		// listをJSONとして返す
 		return new Response(JSON.stringify(objectList), {
