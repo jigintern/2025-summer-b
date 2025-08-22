@@ -3,7 +3,7 @@ import { UUID } from "npm:uuidjs";
 
 import newsList from "./public/news.json" with {type:"json"};
 
-type newpapersModel = {
+type newspaperModel = {
 	"uuid": string;
 	"enable": boolean;
 	"createdAt": Date | null;
@@ -32,7 +32,7 @@ Deno.serve(async (req: Request) => {
 		let newsUUID: string = "";
 
 		// list: 条件指定の取得
-		const newspapers: Deno.KvListIterator<newpapersModel> = kv.list({
+		const newspapers: Deno.KvListIterator<newspaperModel> = kv.list({
 			prefix: ["newspaper"],
 		});
 
