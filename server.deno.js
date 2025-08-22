@@ -1,7 +1,7 @@
 import { serveDir } from "jsr:@std/http/file-server";
 import { UUID } from "npm:uuidjs";
 
-import newsList from "./public/news.json" with { type: "json" };
+import newsList from "./public/data/news.json" with { type: "json" };
 
 Deno.serve(async (req) => {
     const pathname = new URL(req.url).pathname;
@@ -39,6 +39,11 @@ Deno.serve(async (req) => {
         return new Response(JSON.stringify(selectedTitles), {
             headers: { "Content-Type": "application/json" },
         });
+    }
+    if (req.method === "GET" && pathname === "thread-posts") {
+        const threadId = new URL(req.url).searchParams.get("thread-id");
+        const kv = Deno.openKv();
+        return await kv.list({ prefix: [threadId] });
     }
 
     return serveDir(req, {
