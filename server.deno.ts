@@ -27,7 +27,7 @@ Deno.serve(async (req: Request) => {
 		// Deno KVにアクセス
 		const kv: Deno.Kv = await Deno.openKv();
 
-		const objectList: ThreadModel[] = [];
+		const threadList: ThreadModel[] = [];
 
 		let newsUUID: string = "";
 
@@ -50,7 +50,7 @@ Deno.serve(async (req: Request) => {
 			});
 
 			for await (const runningThread of runningThreads) {
-				objectList.push(runningThread.value);
+				threadList.push(runningThread.value);
 			}
 		} else {
 			newsUUID = UUID.generate();
@@ -67,17 +67,17 @@ Deno.serve(async (req: Request) => {
 
 			for (let i = 0; i < selectedTitles.length; i++) {
 				const threadUUID: string = UUID.generate();
-				objectList.push({
+				threadList.push({
 					"uuid": threadUUID,
 					"title": selectedTitles[i],
 					"summary": null,
 				});
-				await kv.set([newsUUID, threadUUID], objectList.at(-1));
+				await kv.set([newsUUID, threadUUID], threadList.at(-1));
 			}
 		}
 
 		// listをJSONとして返す
-		return new Response(JSON.stringify(objectList), {
+		return new Response(JSON.stringify(threadList), {
 			headers: { "Content-Type": "application/json" },
 		});
 	}
