@@ -6,10 +6,6 @@
 <body>
 <h1>掲示板一覧</h1>
 
-        <div>
-            <button id="greeting">更新</button>
-        </div>
-
 <ul id="bbs-list"></ul>
 
 </body>
@@ -37,7 +33,7 @@
         }
 
         // greetingを叩くためのjavascriptの実装
-        document.getElementById("greeting").onclick = async () => {
+        window.onload = async () => {
             try {
                 const response = await fetch("/thread-titles");
                 const responseToJson = await response.json();
