@@ -4,7 +4,9 @@
   },
   "lint": {
     "include": [
-      "./**/*.js"
+      "./**/*.html",
+      "./**/*.css",
+      "./**/*.ts"
     ],
     "rules": {
       "tags": [
@@ -23,7 +25,9 @@
     "singleQuote": false,
     "proseWrap": "preserve",
     "include": [
-      "./**/*.js"
+      "./**/*.html",
+      "./**/*.css",
+      "./**/*.ts"
     ]
   }
 }
