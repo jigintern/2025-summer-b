@@ -1,9 +1,10 @@
 import { serveDir } from "jsr:@std/http/file-server";
 import { UUID } from "npm:uuidjs";
 
-import newsList from "./public/news.json" with {type:"json"};
+import newsList from "./public/data/news.json" with {type:"json"};
+import samplePosts from "./public/data/samplePosts.json" with {type: "json"};
 
-type newpapersModel = {
+type newspaperModel = {
 	"uuid": string;
 	"enable": boolean;
 	"createdAt": Date | null;
@@ -14,6 +15,12 @@ type ThreadModel = {
 	"title": string;
 	"summary": string | null;
 };
+
+type PostModel = {
+	userName: string;
+	post: string;
+	createdAt: Date;
+}
 
 Deno.serve(async (req: Request) => {
 	const pathname: string = new URL(req.url).pathname;
@@ -32,7 +39,7 @@ Deno.serve(async (req: Request) => {
 		let newsUUID: string = "";
 
 		// list: 条件指定の取得
-		const newspapers: Deno.KvListIterator<newpapersModel> = kv.list({
+		const newspapers: Deno.KvListIterator<newspaperModel> = kv.list({
 			prefix: ["newspaper"],
 		});
 
@@ -80,6 +87,50 @@ Deno.serve(async (req: Request) => {
 		return new Response(JSON.stringify(threadList), {
 			headers: { "Content-Type": "application/json" },
 		});
+	}
+
+	if (req.method === "GET" && pathname === "/thread-posts") {
+        const threadId: string | null = new URL(req.url).searchParams.get("thread-id");
+
+		if (!threadId) {
+            return new Response("Missing thread-id parameter", { status: 400 });
+        }
+
+		
+        const kv: Deno.Kv = await Deno.openKv();
+        const postList: Deno.KvListIterator<PostModel> = await kv.list({ prefix: [threadId] });
+
+		const threadPosts: PostModel[]  = []
+		for await(const post of postList) {
+			threadPosts.push(post.value);
+		}
+
+		return new Response(JSON.stringify(threadPosts), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+    });
+    }
+
+	// テスト会話データ作成用のAPI
+	if (req.method === "GET" && pathname === "/create-posts") {
+		const threadId: string | null = new URL(req.url).searchParams.get("thread-id");
+
+		if (!threadId) {
+            return new Response("Missing thread-id parameter", { status: 400 });
+        }
+		const kv: Deno.Kv = await Deno.openKv();
+
+		const posts: PostModel[] = <PostModel[]>samplePosts;
+
+		for (let i = 0; i < posts.length; i++){
+			await kv.set([threadId, i], {posts});
+		}
+
+		return new Response("create successful", {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+    });
+		
 	}
 
 	return serveDir(req, {
