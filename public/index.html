@@ -6,6 +6,9 @@
 <body>
 <h1>掲示板一覧</h1>
 
+        <div>
+            <button id="greeting">更新</button>
+        </div>
 
 <ul id="bbs-list"></ul>
 
@@ -14,32 +17,38 @@
 <script>
   const bbsContainer = document.getElementById("bbs-list");
 
-  const bbsList = [
-    { id: 1, name: "掲示板1" },
-    { id: 2, name: "掲示板2" },
-    { id: 3, name: "掲示板3" },
-    { id: 4, name: "掲示板4" },
-    { id: 5, name: "掲示板5" },
-    { id: 6, name: "掲示板6" },
-    { id: 7, name: "掲示板7" },
-    { id: 8, name: "掲示板8" },
-    { id: 9, name: "掲示板9" },
-    { id: 10, name: "掲示板10" }
-  ];
+        let bbsList = [];
 
-    function renderBbs() {
-      // いったん中身をクリア
-      bbsContainer.innerHTML = "";
-      // 配列の内容を順に表示
-      bbsList.forEach(p => {
-        const li = document.createElement("li"); // 投稿全体のdivを作成
-        li.className = "bbs"; // CSS用クラスを付与
-        li.innerHTML = `
+        function renderBbs(threadList) {
+            // いったん中身をクリア
+            bbsContainer.innerHTML = "";
+            // 配列の内容を順に表示
+            if (threadList) {
+                bbsList = threadList;
+            }
+            bbsList.forEach((p) => {
+                const li = document.createElement("li"); // 投稿全体のdivを作成
+                li.className = "bbs"; // CSS用クラスを付与
+                li.innerHTML = `
           <a href="/thread.html?=${p.id}">${p.name}</a>
         `;
-        bbsContainer.appendChild(li); // 親要素に追加
-      });
-    }
-    renderBbs();
+                bbsContainer.appendChild(li); // 親要素に追加
+            });
+        }
+
+        // greetingを叩くためのjavascriptの実装
+        document.getElementById("greeting").onclick = async () => {
+            try {
+                const response = await fetch("/thread-titles");
+                const responseToJson = await response.json();
+                const threadList = responseToJson.map((thread, i) => ({
+                    id: i + 1,
+                    name: thread.title,
+                }));
+                renderBbs(threadList);
+            } catch (e) {
+                console.log("error: ", e);
+            }
+        };
 </script>
 </html>
