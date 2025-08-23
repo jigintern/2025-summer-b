@@ -100,11 +100,11 @@ Deno.serve(async (req) => {
             const data = await response.json();
             const summary = data.candidates[0].content.parts[0].text;
 
-            const threadUuid = requestJson.thredUuid;
+            const threadUuid = requestJson.threadUuid;
             const index = requestJson.index;
 
             const kv = Deno.openKv();
-            const threadData = (await kv).get([thredUuid, index]);
+            const threadData = (await kv).get([threadUuid, index]);
             await kv.set([threadUuid, index], { ...threadData, "summary": summary });
             return new Response(text, { status: 200 });
         } catch (error) {
