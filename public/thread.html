@@ -150,7 +150,18 @@
 
                 // 現在時刻を投稿時刻として使う
                 const now = new Date();
-                const createdAt = now.toLocaleString(); // 例: 2025/8/21 15:30:00
+                const toStringCreatedAt = now.toLocaleString(); // 例: 2025-08-21T10:00:00.000Z
+                const index = toStringCreatedAt.indexOf(".");
+
+                if (index !== -1) {
+                    const result = toStringCreatedAt.slice(0, index);
+                } else {
+                    console.log("検索文字が見つかりませんでした");
+                }
+                const createdAt = toStringCreatedAt.replace("T", " ").slice(
+                    0,
+                    index,
+                ); // 例: 2025/8/21 15:30:00
 
                 // 新しい投稿を配列に追加
                 posts.push({ userName, post: postContent, createdAt });
