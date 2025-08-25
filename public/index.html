@@ -1,62 +1,62 @@
 <!DOCTYPE html>
 <html>
+    <head>
+        <meta charset="utf-8">
+        <!--表示領域を端末の幅に合わせる-->
+        <meta name="viewport" content="width=device-width" , initial-scale="1">
+        <link rel="stylesheet" href="style-bbs.css">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link
+            href="https://fonts.googleapis.com/css2?family=DotGothic16&family=Outfit:wght@100..900&display=swap"
+            rel="stylesheet"
+        >
 
-<head>
-  <meta charset="utf-8">
-  <!--表示領域を端末の幅に合わせる-->
-  <meta name="viewport" content="width=device-width" , initial-scale=1>
-  <link rel="stylesheet" href="style-bbs.css">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=Outfit:wght@100..900&display=swap"
-    rel="stylesheet">
+        <title>掲示板一覧</title>
+    </head>
 
-  <title>掲示板一覧</title>
-</head>
+    <body>
+        <h1>掲示板一覧</h1>
 
-<body>
-  <h1>掲示板一覧</h1>
+        <ul id="bbs-list"></ul>
+    </body>
 
-  <ul id="bbs-list"></ul>
-</body>
+    <script>
+        const bbsContainer = document.getElementById("bbs-list");
 
-<script>
-  const bbsContainer = document.getElementById("bbs-list");
+        let bbsList = [];
 
-  let bbsList = [];
+        function renderBbs(threadList) {
+            // いったん中身をクリア
+            bbsContainer.innerHTML = "";
+            // 配列の内容を順に表示
+            if (threadList) {
+                bbsList = threadList;
+            }
+            bbsList.forEach((p) => {
+                const li = document.createElement("li"); // 投稿全体のdivを作成
+                li.className = "bbs"; // CSS用クラスを付与
+                const a = document.createElement("a"); // <a></a>を作成
+                a.href = `thread.html?id=${p.id}&title=${p.name}`; // <a href="thread.html?id=1?title=掲示板1"></a>
+                a.textContent = p.name; // <a>掲示板1</a>
+                li.appendChild(a); // <li><a>掲示板1</a></li>
+                bbsContainer.appendChild(li); // 親要素に追加
+            });
+        }
 
-  function renderBbs(threadList) {
-    // いったん中身をクリア
-    bbsContainer.innerHTML = "";
-    // 配列の内容を順に表示
-    if (threadList) {
-      bbsList = threadList;
-    }
-    bbsList.forEach((p) => {
-      const li = document.createElement("li"); // 投稿全体のdivを作成
-      li.className = "bbs"; // CSS用クラスを付与
-      const a = document.createElement("a"); // <a></a>を作成
-      a.href = `thread.html?id=${p.id}&title=${p.name}`; // <a href="thread.html?id=1?title=掲示板1"></a>
-      a.textContent = p.name; // <a>掲示板1</a>
-      li.appendChild(a); // <li><a>掲示板1</a></li>
-      bbsContainer.appendChild(li); // 親要素に追加
-    });
-  }
-
-  // greetingを叩くためのjavascriptの実装
-  window.onload = async () => {
-    try {
-      const response = await fetch("/thread-titles");
-      const responseToJson = await response.json();
-      const threadList = responseToJson.map((thread, i) => ({
-        id: i + 1,
-        name: thread.title,
-      }));
-      renderBbs(threadList);
-    } catch (e) {
-      console.log("error: ", e);
-    }
-  };
-</script>
-
+        // greetingを叩くためのjavascriptの実装
+        window.onload = async () => {
+            try {
+                const response = await fetch("/thread-titles");
+                const responseToJson = await response.json();
+                const threadList = responseToJson.map((thread, i) => ({
+                    id: i + 1,
+                    name: thread.title,
+                }));
+                renderBbs(threadList);
+            } catch (e) {
+                console.log("error: ", e);
+            }
+        };
+    </script>
 </html>

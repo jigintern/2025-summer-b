@@ -1,17 +1,17 @@
 body {
-  margin: 0;
-  position: relative;
-  background-color: #c9d6d8;
+    margin: 0;
+    position: relative;
+    background-color: #c9d6d8;
 }
 
 h1 {
-  text-align: center;
-  padding: 10px 0;
+    text-align: center;
+    padding: 10px 0;
 
-  font-family: "DotGothic16", sans-serif;
-  font-weight: bold;
-  font-style: normal;
-  font-size: 64px;
+    font-family: "DotGothic16", sans-serif;
+    font-weight: bold;
+    font-style: normal;
+    font-size: 64px;
 }
 
 /* 背景画像用
@@ -29,22 +29,22 @@ body::before {
 
   opacity: 0.2;
   /* 透過度を調整 */
-  /* filter: blur(3px); */
-  /*ぼかし*/
-  /* z-index: -1; */
-  /* 背景を最背面に配置、本文より下に表示させる */
-/* } */ 
+/* filter: blur(3px); */
+/*ぼかし*/
+/* z-index: -1; */
+/* 背景を最背面に配置、本文より下に表示させる */
+/* } */
 
 ul#bbs-list {
-  padding: 0;
-  margin: 0;
+    padding: 0;
+    margin: 0;
 }
 
 li.bbs {
-  list-style: none;
-  margin: 10px 0 10px 20px;
+    list-style: none;
+    margin: 10px 0 10px 20px;
 
-  font-family: "DotGothic16", sans-serif;
-  font-weight: 400;
-  font-style: normal;
+    font-family: "DotGothic16", sans-serif;
+    font-weight: 400;
+    font-style: normal;
 }
