@@ -22,6 +22,12 @@ type PostModel = {
     createdAt: Date;
 };
 
+type SamplePost = {
+    userName: string;
+    post: string;
+    createdAt: string;
+};
+
 Deno.serve(async (req: Request) => {
     const pathname: string = new URL(req.url).pathname;
 
@@ -108,6 +114,16 @@ Deno.serve(async (req: Request) => {
             headers: { "Content-Type": "application/json" },
         });
     }
+    function convertToPostModel(samplePost: SamplePost): PostModel {
+        return {
+            ...samplePost,
+            createdAt: new Date(samplePost.createdAt),
+        };
+    }
+
+    function convertSamplePostsToPostModels(samplePosts: SamplePost[]): PostModel[] {
+        return samplePosts.map(convertToPostModel);
+    }
 
     // テスト会話データ作成用のAPI
     if (req.method === "GET" && pathname === "/create-posts") {
@@ -118,7 +134,7 @@ Deno.serve(async (req: Request) => {
         }
         const kv: Deno.Kv = await Deno.openKv();
 
-        const posts: PostModel[] = <PostModel[]> samplePosts;
+        const posts: PostModel[] = convertSamplePostsToPostModels(samplePosts);
 
         for (let i = 0; i < posts.length; i++) {
             await kv.set([threadId, i], posts[i]);
