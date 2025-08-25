@@ -1,117 +1,138 @@
 <!DOCTYPE html>
 <html lang="ja">
-<head>
-  <meta charset="UTF-8">
-  <title>掲示板</title>
-  <style>
-    body {
-      font-family: sans-serif;
-      padding: 20px;
-    }
-    .post {
-      border: 1px solid #ccc;
-      padding: 10px;
-      margin-bottom: 10px;
-      border-radius: 5px;
-    }
-    .post .user {
-      font-weight: bold;
-    }
-    .post .date {
-      font-size: 0.9em;
-      color: #666;
-    }
-    /* 入力フォームをページ下に配置 */
-    .form-container {
-      margin-top: 30px;
-      padding: 15px;
-      border-top: 2px solid #ccc;
-    }
-    .form-container input, .form-container textarea {
-      width: 100%;
-      padding: 8px;
-      margin-bottom: 10px;
-      box-sizing: border-box;
-    }
-    .form-container button {
-      padding: 8px 16px;
-      cursor: pointer;
-    }
-  </style>
-</head>
-<body>
-  <h1>掲示板</h1>
-  <!-- 投稿を表示するエリア -->
-  <div id="posts"></div>
+    <head>
+        <meta charset="UTF-8">
+        <title>掲示板</title>
+        <style>
+            body {
+                font-family: sans-serif;
+                padding: 20px;
+            }
+            .post {
+                border: 1px solid #ccc;
+                padding: 10px;
+                margin-bottom: 10px;
+                border-radius: 5px;
+            }
+            .post .user {
+                font-weight: bold;
+            }
+            .post .date {
+                font-size: 0.9em;
+                color: #666;
+            }
+            /* 入力フォームをページ下に配置 */
+            .form-container {
+                margin-top: 30px;
+                padding: 15px;
+                border-top: 2px solid #ccc;
+            }
+            .form-container input, .form-container textarea {
+                width: 100%;
+                padding: 8px;
+                margin-bottom: 10px;
+                box-sizing: border-box;
+            }
+            .form-container button {
+                padding: 8px 16px;
+                cursor: pointer;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>掲示板</h1>
+        <!-- 投稿を表示するエリア -->
+        <div id="posts"></div>
 
-  <!-- 入力フォーム -->
-  <div class="form-container">
-    <h2>新しい投稿</h2>
-    <!-- 名前入力欄 -->
-    <input type="text" id="userName" placeholder="名前を入力">
-    <!-- 投稿内容入力欄 -->
-    <textarea id="postContent" rows="4" placeholder="投稿内容を入力"></textarea>
-    <!-- 送信ボタン -->
-    <button id="submitBtn">送信</button>
-  </div>
+        <!-- 入力フォーム -->
+        <div class="form-container">
+            <h2>新しい投稿</h2>
+            <!-- 名前入力欄 -->
+            <input type="text" id="userName" placeholder="名前を入力">
+            <!-- 投稿内容入力欄 -->
+            <textarea
+                id="postContent"
+                rows="4"
+                placeholder="投稿内容を入力"
+            ></textarea>
+            <!-- 送信ボタン -->
+            <button id="submitBtn">送信</button>
+        </div>
 
-  <script>
-    // --- 仮のサーバーから返ってくるデータ（実際にはAPIなどから取得予定） ---
-    const posts = [
-      { userName: "田中", post: "こんにちは！", createdAt: "2025-08-21 10:00" },
-      { userName: "佐藤", post: "今日はいい天気ですね。", createdAt: "2025-08-21 11:30" },
-      { userName: "鈴木", post: "明日の予定はどうですか？", createdAt: "2025-08-21 12:00" }
-    ];
+        <script>
+            // --- 仮のサーバーから返ってくるデータ（実際にはAPIなどから取得予定） ---
+            const posts = [
+                {
+                    userName: "田中",
+                    post: "こんにちは！",
+                    createdAt: "2025-08-21 10:00",
+                },
+                {
+                    userName: "佐藤",
+                    post: "今日はいい天気ですね。",
+                    createdAt: "2025-08-21 11:30",
+                },
+                {
+                    userName: "鈴木",
+                    post: "明日の予定はどうですか？",
+                    createdAt: "2025-08-21 12:00",
+                },
+            ];
 
-    // 投稿を表示する親要素
-    const postsContainer = document.getElementById("posts");
+            // 投稿を表示する親要素
+            const postsContainer = document.getElementById("posts");
 
-    // --- 投稿をHTMLに描画する関数 ---
-    function renderPosts() {
-      // いったん中身をクリア
-      postsContainer.innerHTML = "";
-      // 配列の内容を順に表示
-      posts.forEach(p => {
-        const div = document.createElement("div"); // 投稿全体のdivを作成
-        div.className = "post"; // CSS用クラスを付与
-        div.innerHTML = `
+            // --- 投稿をHTMLに描画する関数 ---
+            function renderPosts() {
+                // いったん中身をクリア
+                postsContainer.innerHTML = "";
+                // 配列の内容を順に表示
+                posts.forEach((p) => {
+                    const div = document.createElement("div"); // 投稿全体のdivを作成
+                    div.className = "post"; // CSS用クラスを付与
+                    div.innerHTML = `
           <div class="user">${p.userName}</div>
           <div class="date">${p.createdAt}</div>
           <div class="content">${p.post}</div>
         `;
-        postsContainer.appendChild(div); // 親要素に追加
-      });
-    }
+                    postsContainer.appendChild(div); // 親要素に追加
+                });
+            }
 
-    // ページ読み込み時に仮データを描画
-    renderPosts();
+            // ページ読み込み時に仮データを描画
+            renderPosts();
 
-    // --- 送信ボタンが押されたときの処理 ---
-    document.getElementById("submitBtn").addEventListener("click", () => {
-      // 入力値を取得
-      const userName = document.getElementById("userName").value.trim();
-      const postContent = document.getElementById("postContent").value.trim();
+            // --- 送信ボタンが押されたときの処理 ---
+            document.getElementById("submitBtn").addEventListener(
+                "click",
+                () => {
+                    // 入力値を取得
+                    const userName = document.getElementById("userName").value
+                        .trim();
+                    const postContent = document.getElementById("postContent")
+                        .value.trim();
 
-      // 入力が空ならアラートを表示して処理を中断
-      if (!userName || !postContent) {
-        alert("名前と投稿内容を入力してください");
-        return;
-      }
+                    // 入力が空ならアラートを表示して処理を中断
+                    if (!userName || !postContent) {
+                        alert("名前と投稿内容を入力してください");
+                        return;
+                    }
 
-      // 現在時刻を投稿時刻として使う
-      const now = new Date();
-      const createdAt = now.toLocaleString(); // 例: 2025/8/21 15:30:00
+                    // 現在時刻を投稿時刻として使う
+                    const now = new Date();
+                    const createdAt = now.toLocaleString(); // 例: 2025/8/21 15:30:00
 
-      // 新しい投稿を配列に追加
-      posts.push({ userName, post: postContent, createdAt });
+                    // 新しい投稿を配列に追加
+                    posts.push({ userName, post: postContent, createdAt });
 
-      // 再描画して新しい投稿を反映
-      renderPosts();
+                    // 再描画して新しい投稿を反映
+                    renderPosts();
 
-      // 入力欄をリセット
-      document.getElementById("userName").value = "";
-      document.getElementById("postContent").value = "";
-    });
-  </script>
-</body>
+                    // 入力欄をリセット
+                    document.getElementById("userName").value = "";
+                    document.getElementById("postContent").value = "";
+                },
+            );
+        </script>
+    </body>
 </html>

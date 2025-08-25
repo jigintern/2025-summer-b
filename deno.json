@@ -1,0 +1,47 @@
+{
+  "tasks": {
+    "start": "deno run -A --watch --unstable-kv server.deno.ts"
+  },
+  "lint": {
+    "include": [
+<<<<<<< HEAD
+      "./**/*.html",
+      "./**/*.css",
+      "./**/*.ts"
+=======
+      "./**/*.js",
+      "./**/*.ts",
+      "./**/*.html",
+      "./**/*.css"
+>>>>>>> main
+    ],
+    "rules": {
+      "tags": [
+        "recommended"
+      ],
+      "include": [
+        "ban-untagged-todo"
+      ]
+    }
+  },
+  "fmt": {
+    "useTabs": false,
+    "lineWidth": 100,
+    "indentWidth": 4,
+    "semiColons": true,
+    "singleQuote": false,
+    "proseWrap": "preserve",
+    "include": [
+<<<<<<< HEAD
+      "./**/*.html",
+      "./**/*.css",
+      "./**/*.ts"
+=======
+      "./**/*.js",
+      "./**/*.ts",
+      "./**/*.html",
+      "./**/*.css"
+>>>>>>> main
+    ]
+  }
+}
