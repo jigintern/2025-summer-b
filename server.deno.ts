@@ -1,6 +1,6 @@
 import { serveDir } from "jsr:@std/http/file-server";
 import { UUID } from "npm:uuidjs";
-
+import "https://deno.land/std@0.224.0/dotenv/load.ts";
 import newsList from "./public/data/news.json" with { type: "json" };
 import samplePosts from "./public/data/samplePosts.json" with { type: "json" };
 
@@ -121,7 +121,7 @@ Deno.serve(async (req: Request) => {
         const posts: PostModel[] = <PostModel[]> samplePosts;
 
         for (let i = 0; i < posts.length; i++) {
-            await kv.set([threadId, i], { posts });
+            await kv.set([threadId, i], posts[i]);
         }
 
         return new Response("create successful", {
@@ -141,14 +141,11 @@ Deno.serve(async (req: Request) => {
         }
 
         const requestJson = await req.json();
-        const threadUuid: string = requestJson.uuid;
+        const threadId: string = requestJson.uuid;
         const title: string = requestJson.title;
-        // const conversation: PostModel[] = requestJson.conversation;
 
         const kv: Deno.Kv = await Deno.openKv();
-        const postDataList: Deno.KvListIterator<PostModel> = kv.list({
-            prefix: [threadUuid],
-        });
+        const postDataList: Deno.KvListIterator<PostModel> = await kv.list({ prefix: [threadId] });
 
         let postList: string = "";
 
@@ -197,12 +194,12 @@ Deno.serve(async (req: Request) => {
             const summary: string = data.candidates[0].content.parts[0].text;
             const index = requestJson.index;
             const selectedThread: ThreadModel = {
-                "uuid": threadUuid,
+                "uuid": threadId,
                 "title": title,
                 "summary": summary,
             };
 
-            await kv.set([threadUuid, index], selectedThread);
+            await kv.set([threadId, index], selectedThread);
             return new Response(JSON.stringify(selectedThread), { status: 200 });
         } catch (error) {
             console.error("An error occurred:", error);
