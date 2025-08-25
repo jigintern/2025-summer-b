@@ -31,3 +31,10 @@ git config commit.template ./.commit_template
 
 emoji prefix
 にはコミット履歴が可愛くなる他にもメリットがありますが、コミット履歴が可愛くなるのが好きで使ってます。
+
+## gemini APIを用いたendpointの実行方法
+`.env.copy`から`.env`を作成
+```shell
+cp .env.copy .env
+```
+geminiのAPI KEYを取得し、`.env`内の`GOOGLE_API_KEY`に入れる

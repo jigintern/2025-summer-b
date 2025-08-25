@@ -1,20 +1,21 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width">
-    <title>掲示板一覧</title>
-  </head>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width">
+        <title>掲示板一覧</title>
+    </head>
 
-  <body>
-    <h1>掲示板一覧</h1>
+    <body>
+        <h1>掲示板一覧</h1>
 
-    <ul id="bbs-list"></ul>
-  </body>
+        <ul id="bbs-list"></ul>
+    </body>
 
-  <script>
-    const bbsContainer = document.getElementById("bbs-list");
+    <script>
+        const bbsContainer = document.getElementById("bbs-list");
 
+<<<<<<< HEAD
         let bbsList = [];
 
         function renderBbs(threadList) {
@@ -24,6 +25,25 @@
             if (threadList) {
                 bbsList = threadList;
             }
+=======
+        const bbsList = [
+            { id: 1, name: "掲示板1" },
+            { id: 2, name: "掲示板2" },
+            { id: 3, name: "掲示板3" },
+            { id: 4, name: "掲示板4" },
+            { id: 5, name: "掲示板5" },
+            { id: 6, name: "掲示板6" },
+            { id: 7, name: "掲示板7" },
+            { id: 8, name: "掲示板8" },
+            { id: 9, name: "掲示板9" },
+            { id: 10, name: "掲示板10" },
+        ];
+
+        function renderBbs() {
+            // いったん中身をクリア
+            bbsContainer.innerHTML = "";
+            // 配列の内容を順に表示
+>>>>>>> main
             bbsList.forEach((p) => {
                 const li = document.createElement("li"); // 投稿全体のdivを作成
                 li.className = "bbs"; // CSS用クラスを付与
@@ -33,6 +53,7 @@
                 bbsContainer.appendChild(li); // 親要素に追加
             });
         }
+<<<<<<< HEAD
 
         // greetingを叩くためのjavascriptの実装
         window.onload = async () => {
@@ -50,4 +71,8 @@
         };
 </script>
 
+=======
+        renderBbs();
+    </script>
+>>>>>>> main
 </html>

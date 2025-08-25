@@ -1,12 +1,19 @@
 {
   "tasks": {
-    "start": "deno run --watch --unstable-kv --allow-net --allow-read server.deno.ts"
+    "start": "deno run -A --watch --unstable-kv server.deno.ts"
   },
   "lint": {
     "include": [
+<<<<<<< HEAD
       "./**/*.html",
       "./**/*.css",
       "./**/*.ts"
+=======
+      "./**/*.js",
+      "./**/*.ts",
+      "./**/*.html",
+      "./**/*.css"
+>>>>>>> main
     ],
     "rules": {
       "tags": [
@@ -25,9 +32,16 @@
     "singleQuote": false,
     "proseWrap": "preserve",
     "include": [
+<<<<<<< HEAD
       "./**/*.html",
       "./**/*.css",
       "./**/*.ts"
+=======
+      "./**/*.js",
+      "./**/*.ts",
+      "./**/*.html",
+      "./**/*.css"
+>>>>>>> main
     ]
   }
 }
