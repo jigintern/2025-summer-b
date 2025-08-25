@@ -40,7 +40,7 @@
         </style>
     </head>
     <body>
-        <h1>掲示板</h1>
+        <h1 id="title"></h1>
         <!-- 投稿を表示するエリア -->
         <div id="posts"></div>
 
@@ -61,24 +61,10 @@
 
         <script>
             // --- 仮のサーバーから返ってくるデータ（実際にはAPIなどから取得予定） ---
-            let posts = [
-                {
-                    userName: "田中",
-                    post: "こんにちは！",
-                    createdAt: "2025-08-21 10:00",
-                },
-                {
-                    userName: "佐藤",
-                    post: "今日はいい天気ですね。",
-                    createdAt: "2025-08-21 11:30",
-                },
-                {
-                    userName: "鈴木",
-                    post: "明日の予定はどうですか？",
-                    createdAt: "2025-08-21 12:00",
-                },
-            ];
+            let posts = [];
 
+            // タイトルを表示する親要素
+            const titleContainer = document.getElementById("title");
             // 投稿を表示する親要素
             const postsContainer = document.getElementById("posts");
 
@@ -110,12 +96,19 @@
 
             // greetingを叩くためのjavascriptの実装
             window.onload = async () => {
+                // いったん中身をクリア
+                titleContainer.innerHTML = "";
+
                 try {
-                    const params = new URLSearchParams(document.location.search)
-                        .get("");
-                    const endpoint = `/thread-posts?thread-id=${params}`;
+                    const params = new URLSearchParams(document.location.search);
+                    const endpoint = `/thread-posts?thread-id=${params.get("id")}`;
                     const response = await fetch(endpoint);
                     const responseToJson = await response.json();
+
+                    const span = document.createElement("span"); // タイトルのspanを作成
+                    span.innerHTML = params.get("title");
+                    titleContainer.appendChild(span); // 親要素に追加
+
                     renderPosts(responseToJson);
                 } catch (e) {
                     console.log("error: ", e);
