@@ -1,45 +1,57 @@
-<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width">
-<title>掲示板一覧</title>
+<!DOCTYPE html>
+<html>
 
+<head>
+  <meta charset="utf-8">
+  <!--表示領域を端末の幅に合わせる-->
+  <meta name="viewport" content="width=device-width" , initial-scale=1>
+  <link rel="stylesheet" href="style-bbs.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=Outfit:wght@100..900&display=swap"
+    rel="stylesheet">
+
+  <title>掲示板一覧</title>
 </head>
 
 <body>
-<h1>掲示板一覧</h1>
+  <h1>掲示板一覧</h1>
 
-
-<ul id="bbs-list"></ul>
-
+  <ul id="bbs-list"></ul>
 </body>
 
 <script>
-  const bbsContainer = document.getElementById("bbs-list");
+  const bbsContainer = document.getElementById("bbs-list"); //document（ページ全体）からid属性bbs-listを持つ要素を取得
 
   const bbsList = [
-    { id: 1, name: "掲示板1" },
-    { id: 2, name: "掲示板2" },
-    { id: 3, name: "掲示板3" },
-    { id: 4, name: "掲示板4" },
-    { id: 5, name: "掲示板5" },
-    { id: 6, name: "掲示板6" },
-    { id: 7, name: "掲示板7" },
-    { id: 8, name: "掲示板8" },
-    { id: 9, name: "掲示板9" },
-    { id: 10, name: "掲示板10" }
+    { id: 1, name: "サッカー日本代表W杯ドイツ大会で惨敗" },
+    { id: 2, name: "AKB総選挙、前田敦子が涙の首位奪還" },
+    { id: 3, name: "千と千尋、興収歴代1位更新で宮崎駿また伝説に" },
+    { id: 4, name: "【悲報】2ちゃんねる閉鎖騒動、管理人ひろゆき失踪説浮上" },
+    { id: 5, name: "USJ開園するも来場者数伸びず赤字スタート" },
+    { id: 6, name: "【速報】iPhone発売初日、アップルストア前に大行列" },
+    { id: 7, name: "【訃報】スティーブ・ジョブズ死去 Apple信者集結中" },
+    { id: 8, name: "秋葉原無差別殺傷事件、通行人が次々と被害に" },
+    { id: 9, name: "松井秀喜ヤンキースで大活躍、日本人大リーガー増加" },
+    { id: 10, name: "【もやし祭り】VIPPERの皆でもやし買い占めようぜｗｗｗｗｗｗｗｗ" },
   ];
 
-    function renderBbs() {
-      // いったん中身をクリア
-      bbsContainer.innerHTML = "";
-      // 配列の内容を順に表示
-      bbsList.forEach(p => {
-        const li = document.createElement("li"); // 投稿全体のdivを作成
-        li.className = "bbs"; // CSS用クラスを付与
-        li.innerHTML = `
-          <a href="/thread.html?=${p.id}">${p.name}</a>
-        `;
-        bbsContainer.appendChild(li); // 親要素に追加
-      });
-    }
-    renderBbs();
+  const renderBbs = () => {
+    // listの中身をクリア
+    bbsContainer.innerHTML = "";
+    // 配列の内容を順に表示
+    // 取り出した要素をpに代入して繰り返し処理
+    bbsList.forEach((p) => {
+      const li = document.createElement("li"); // <li></li>を作成
+      li.className = "bbs"; // <li class="bbs"></li>
+      const a = document.createElement("a"); // <a></a>を作成
+      a.href = `thread.html?id=${p.id}&title=${p.name}`; // <a href="thread.html?id=1?title=掲示板1"></a>
+      a.textContent = p.name; // <a>掲示板1</a>
+      li.appendChild(a); // <li><a>掲示板1</a></li>
+      bbsContainer.appendChild(li); // <ul> 親要素に追加
+    });
+  }
+  renderBbs();
 </script>
+
 </html>
