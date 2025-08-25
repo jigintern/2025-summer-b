@@ -61,7 +61,7 @@
 
         <script>
             // --- 仮のサーバーから返ってくるデータ（実際にはAPIなどから取得予定） ---
-            const posts = [
+            let posts = [
                 {
                     userName: "田中",
                     post: "こんにちは！",
@@ -83,10 +83,19 @@
             const postsContainer = document.getElementById("posts");
 
             // --- 投稿をHTMLに描画する関数 ---
-            function renderPosts() {
+            function renderPosts(responseToJson) {
                 // いったん中身をクリア
                 postsContainer.innerHTML = "";
+
+                const postList = responseToJson.map((post) => ({
+                    userName: post.userName,
+                    post: post.post,
+                    createdAt: post.createdAt,
+                }));
                 // 配列の内容を順に表示
+                if (postList) {
+                    posts = postList;
+                }
                 posts.forEach((p) => {
                     const div = document.createElement("div"); // 投稿全体のdivを作成
                     div.className = "post"; // CSS用クラスを付与
@@ -99,8 +108,19 @@
                 });
             }
 
-            // ページ読み込み時に仮データを描画
-            renderPosts();
+            // greetingを叩くためのjavascriptの実装
+            window.onload = async () => {
+                try {
+                    const params = new URLSearchParams(document.location.search)
+                        .get("");
+                    const endpoint = `/thread-posts?thread-id=${params}`;
+                    const response = await fetch(endpoint);
+                    const responseToJson = await response.json();
+                    renderPosts(responseToJson);
+                } catch (e) {
+                    console.log("error: ", e);
+                }
+            };
 
             // --- 送信ボタンが押されたときの処理 ---
             document.getElementById("submitBtn").addEventListener(

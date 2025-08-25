@@ -17,9 +17,15 @@
 
         let bbsList = [];
 
-        function renderBbs(threadList) {
+        function renderBbs(responseToJson) {
             // いったん中身をクリア
             bbsContainer.innerHTML = "";
+
+            const threadList = responseToJson.map((thread) => ({
+                id: thread.uuid,
+                name: thread.title,
+            }));
+
             // 配列の内容を順に表示
             if (threadList) {
                 bbsList = threadList;
@@ -39,15 +45,11 @@
             try {
                 const response = await fetch("/thread-titles");
                 const responseToJson = await response.json();
-                const threadList = responseToJson.map((thread, i) => ({
-                    id: i + 1,
-                    name: thread.title,
-                }));
-                renderBbs(threadList);
+
+                renderBbs(responseToJson);
             } catch (e) {
                 console.log("error: ", e);
             }
         };
-</script>
-
+    </script>
 </html>

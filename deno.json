@@ -4,16 +4,10 @@
   },
   "lint": {
     "include": [
-<<<<<<< HEAD
-      "./**/*.html",
-      "./**/*.css",
-      "./**/*.ts"
-=======
       "./**/*.js",
       "./**/*.ts",
       "./**/*.html",
       "./**/*.css"
->>>>>>> main
     ],
     "rules": {
       "tags": [
@@ -32,16 +26,10 @@
     "singleQuote": false,
     "proseWrap": "preserve",
     "include": [
-<<<<<<< HEAD
-      "./**/*.html",
-      "./**/*.css",
-      "./**/*.ts"
-=======
       "./**/*.js",
       "./**/*.ts",
       "./**/*.html",
       "./**/*.css"
->>>>>>> main
     ]
   }
 }
