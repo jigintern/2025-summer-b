@@ -2,7 +2,16 @@
 <html>
     <head>
         <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width">
+        <!--表示領域を端末の幅に合わせる-->
+        <meta name="viewport" content="width=device-width" , initial-scale="1">
+        <link rel="stylesheet" href="style-bbs.css">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link
+            href="https://fonts.googleapis.com/css2?family=DotGothic16&family=Outfit:wght@100..900&display=swap"
+            rel="stylesheet"
+        >
+
         <title>掲示板一覧</title>
     </head>
 
@@ -15,32 +24,42 @@
     <script>
         const bbsContainer = document.getElementById("bbs-list");
 
-        const bbsList = [
-            { id: 1, name: "掲示板1" },
-            { id: 2, name: "掲示板2" },
-            { id: 3, name: "掲示板3" },
-            { id: 4, name: "掲示板4" },
-            { id: 5, name: "掲示板5" },
-            { id: 6, name: "掲示板6" },
-            { id: 7, name: "掲示板7" },
-            { id: 8, name: "掲示板8" },
-            { id: 9, name: "掲示板9" },
-            { id: 10, name: "掲示板10" },
-        ];
+        let bbsList = [];
 
-        function renderBbs() {
+        function renderBbs(responseToJson) {
             // いったん中身をクリア
             bbsContainer.innerHTML = "";
+
+            const threadList = responseToJson.map((thread) => ({
+                id: thread.uuid,
+                name: thread.title,
+            }));
+
             // 配列の内容を順に表示
+            if (threadList) {
+                bbsList = threadList;
+            }
             bbsList.forEach((p) => {
                 const li = document.createElement("li"); // 投稿全体のdivを作成
                 li.className = "bbs"; // CSS用クラスを付与
-                li.innerHTML = `
-          <a href="/thread.html?=${p.id}">${p.name}</a>
-        `;
+                const a = document.createElement("a"); // <a></a>を作成
+                a.href = `thread.html?id=${p.id}&title=${p.name}`; // <a href="thread.html?id=1?title=掲示板1"></a>
+                a.textContent = p.name; // <a>掲示板1</a>
+                li.appendChild(a); // <li><a>掲示板1</a></li>
                 bbsContainer.appendChild(li); // 親要素に追加
             });
         }
-        renderBbs();
+
+        // greetingを叩くためのjavascriptの実装
+        window.onload = async () => {
+            try {
+                const response = await fetch("/thread-titles");
+                const responseToJson = await response.json();
+
+                renderBbs(responseToJson.threads);
+            } catch (e) {
+                console.log("error: ", e);
+            }
+        };
     </script>
 </html>

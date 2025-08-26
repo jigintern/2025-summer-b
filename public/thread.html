@@ -2,6 +2,13 @@
 <html lang="ja">
     <head>
         <meta charset="UTF-8">
+        <link rel="stylesheet" href="style-thread.css">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link
+            href="https://fonts.googleapis.com/css2?family=DotGothic16&family=Outfit:wght@100..900&display=swap"
+            rel="stylesheet"
+        >
         <title>掲示板</title>
         <style>
             body {
@@ -40,7 +47,8 @@
         </style>
     </head>
     <body>
-        <h1>掲示板</h1>
+        <a href="index.html">掲示板一覧へ戻る</a>
+        <h1 id="title"></h1>
         <!-- 投稿を表示するエリア -->
         <div id="posts"></div>
 
@@ -48,91 +56,119 @@
         <div class="form-container">
             <h2>新しい投稿</h2>
             <!-- 名前入力欄 -->
-            <input type="text" id="userName" placeholder="名前を入力">
+            <input type="text" id="userName" value="名無し" placeholder="名前を入力">
             <!-- 投稿内容入力欄 -->
-            <textarea
-                id="postContent"
-                rows="4"
-                placeholder="投稿内容を入力"
-            ></textarea>
+            <textarea id="postContent" rows="4" placeholder="投稿内容を入力"></textarea>
             <!-- 送信ボタン -->
             <button id="submitBtn">送信</button>
         </div>
 
         <script>
+            const queryString = window.location.search;
+            const params = new URLSearchParams(queryString);
+            const title = params.get("title");
+
+            const titleElement = document.getElementById("title");
+
+            if (title) {
+                titleElement.textContent = title;
+            } else {
+                titleElement.textContent = "掲示板";
+            }
+
             // --- 仮のサーバーから返ってくるデータ（実際にはAPIなどから取得予定） ---
-            const posts = [
-                {
-                    userName: "田中",
-                    post: "こんにちは！",
-                    createdAt: "2025-08-21 10:00",
-                },
-                {
-                    userName: "佐藤",
-                    post: "今日はいい天気ですね。",
-                    createdAt: "2025-08-21 11:30",
-                },
-                {
-                    userName: "鈴木",
-                    post: "明日の予定はどうですか？",
-                    createdAt: "2025-08-21 12:00",
-                },
-            ];
+            let posts = [];
 
             // 投稿を表示する親要素
             const postsContainer = document.getElementById("posts");
 
             // --- 投稿をHTMLに描画する関数 ---
-            function renderPosts() {
+            function renderPosts(responseToJson) {
                 // いったん中身をクリア
                 postsContainer.innerHTML = "";
+
+                const postList = responseToJson.map((post) => ({
+                    userName: post.userName,
+                    post: post.post,
+                    createdAt: post.createdAt,
+                }));
                 // 配列の内容を順に表示
+                if (postList) {
+                    posts = postList;
+                }
                 posts.forEach((p) => {
                     const div = document.createElement("div"); // 投稿全体のdivを作成
                     div.className = "post"; // CSS用クラスを付与
                     div.innerHTML = `
-          <div class="user">${p.userName}</div>
-          <div class="date">${p.createdAt}</div>
-          <div class="content">${p.post}</div>
-        `;
+                    <div>    
+                        <div class="user">${p.userName}</div>
+                        <div class="content">${p.post}</div>
+                    </div>
+                    <div class="date">${p.createdAt}</div>
+                `;
                     postsContainer.appendChild(div); // 親要素に追加
                 });
             }
 
-            // ページ読み込み時に仮データを描画
-            renderPosts();
+            // greetingを叩くためのjavascriptの実装
+            window.onload = async () => {
+                // いったん中身をクリア
+                titleElement.innerHTML = "";
+
+                try {
+                    const params = new URLSearchParams(document.location.search);
+                    const endpoint = `/thread-posts?thread-id=${params.get("id")}`;
+                    const response = await fetch(endpoint);
+                    const responseToJson = await response.json();
+
+                    const span = document.createElement("span"); // タイトルのspanを作成
+                    span.innerHTML = params.get("title");
+                    titleElement.appendChild(span); // 親要素に追加
+
+                    renderPosts(responseToJson);
+                } catch (e) {
+                    console.log("error: ", e);
+                }
+            };
 
             // --- 送信ボタンが押されたときの処理 ---
-            document.getElementById("submitBtn").addEventListener(
-                "click",
-                () => {
-                    // 入力値を取得
-                    const userName = document.getElementById("userName").value
-                        .trim();
-                    const postContent = document.getElementById("postContent")
-                        .value.trim();
+            document.getElementById("submitBtn").addEventListener("click", () => {
+                // 入力値を取得
+                const userName = document.getElementById("userName").value.trim();
+                const postContent = document.getElementById("postContent").value
+                    .trim();
 
-                    // 入力が空ならアラートを表示して処理を中断
-                    if (!userName || !postContent) {
-                        alert("名前と投稿内容を入力してください");
-                        return;
-                    }
+                // 入力が空ならアラートを表示して処理を中断
+                if (!postContent) {
+                    alert("投稿内容を入力してください");
+                    return;
+                }
 
-                    // 現在時刻を投稿時刻として使う
-                    const now = new Date();
-                    const createdAt = now.toLocaleString(); // 例: 2025/8/21 15:30:00
+                // 現在時刻を投稿時刻として使う
+                const now = new Date();
+                const toStringCreatedAt = now.toLocaleString(); // 例: 2025-08-21T10:00:00.000Z
+                const index = toStringCreatedAt.indexOf(".");
 
-                    // 新しい投稿を配列に追加
-                    posts.push({ userName, post: postContent, createdAt });
+                if (index !== -1) {
+                    const result = toStringCreatedAt.slice(0, index);
+                } else {
+                    console.log("検索文字が見つかりませんでした");
+                }
+                const createdAt = toStringCreatedAt.replace("T", " ").slice(
+                    0,
+                    index,
+                ); // 例: 2025/8/21 15:30:00
 
-                    // 再描画して新しい投稿を反映
-                    renderPosts();
+                // 新しい投稿を配列に追加
+                posts.push({ userName, post: postContent, createdAt });
 
-                    // 入力欄をリセット
-                    document.getElementById("userName").value = "";
-                    document.getElementById("postContent").value = "";
-                },
-            );
+                // 再描画して新しい投稿を反映
+                renderPosts();
+
+                // 入力欄をリセット
+                document.getElementById("userName").value = "";
+                document.getElementById("postContent").value = "";
+            });
         </script>
     </body>
 </html>
