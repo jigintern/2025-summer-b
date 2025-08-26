@@ -158,7 +158,7 @@ Deno.serve(async (req: Request) => {
         // const threadId: string | null = new URL(req.url).searchParams.get("thread-id");
 
         if (!newspaperId || !index) {
-            return new Response("Missing newspaper-id parameter", { status: 400 });
+            return new Response("Missing newspaper-id or index parameter", { status: 400 });
         }
         const kv: Deno.Kv = await Deno.openKv();
 
