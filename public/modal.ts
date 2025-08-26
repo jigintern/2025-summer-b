@@ -27,7 +27,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     // モーダル外をクリック時の処理
-    window.addEventListener("click", function (event) {
+    globalThis.addEventListener("click", function (event) {
         if (event.target === modal) {
             modal.style.display = "none";
             document.body.style.overflow = "auto"; // スクロール有効化
