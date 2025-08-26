@@ -325,36 +325,36 @@ body {
     .article-container-1 {
         grid-area: 1 / 3 / 7 / 5;
         display: grid;
-        grid-template-columns: 1fr 20px;
+        grid-template-columns: 1fr 10px;
         height: 100%;
     }
     .article-container-2 {
         grid-area: 7 / 3 / 11 / 7;
         display: grid;
-        grid-template-columns: 1fr 20px;
+        grid-template-columns: 1fr 10px;
         height: 100%;
     }
     .article-container-3 {
         grid-area: 11 / 3 / 15 / 7;
         display: grid;
-        grid-template-columns: 1fr 20px;
+        grid-template-columns: 1fr 10px;
         height: 100%;
     }
     .article-container-4 {
         grid-area: 1 / 1 / 8 / 3;
         display: grid;
-        grid-template-columns: 1fr 20px;
+        grid-template-columns: 1fr 10px;
         height: 100%;
     }
     .article-container-5 {
         grid-area: 8 / 1 / 15 / 3;
         display: grid;
-        grid-template-columns: 1fr 20px;
+        grid-template-columns: 1fr 10px;
         height: 100%;
     }
 
     .newspaper-title {
-        font-size: 0.8rem;
+        font-size: 1rem;
     }
 
     /* 日付 */
@@ -364,12 +364,19 @@ body {
 
     /* 見出し */
     .headline {
-        font-size: 0.6rem;
+        font-size: 0.8rem;
     }
 
     .article-body {
         font-size: 0.4rem;
         line-height: 1.1;
+    }
+    @media (min-height: 100px) {
+        .article-body {
+            columns: auto 50px;
+            column-gap: 1px;
+            column-rule: 0.5px solid #95a5a6;
+        }
     }
 }
 
