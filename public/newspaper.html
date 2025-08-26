@@ -3,6 +3,7 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="viewport" content="width=1500px, initial-scale=0.25, user-scalable=yes">
         <title>Document</title>
         <link rel="stylesheet" href="newspaper.css">
     </head>
@@ -139,7 +140,7 @@
 
             <!-- モーダル -->
             <div id="articleModal" class="modal">
-                <div class="modal-content">
+                <div class="modal-area">
                     <span class="close">&times;</span>
                     <h2 id="modalTitle"></h2>
                     <div id="modalContent"></div>
@@ -161,8 +162,11 @@
             // 記事クリック時の処理
             for (let i = 0; i < clickableArticles.length; i++) {
                 clickableArticles[i].addEventListener("click", function () {
-                    const title = this.getAttribute("data-article-title");
-                    const content = this.getAttribute("data-article-content");
+                    // const title = this.getAttribute("data-article-title");
+                    // const content = this.getAttribute("data-article-content");
+                    const title = "モーダル見出し";
+                    const content =
+                        "モーダル内容ああああああああああああああああああああああああああああああああああああああああああああああああ";
 
                     modalTitle.textContent = title;
                     modalContent.textContent = content;
