@@ -22,6 +22,12 @@ type PostModel = {
     createdAt: Date;
 };
 
+type SamplePost = {
+    userName: string;
+    post: string;
+    createdAt: string;
+};
+
 Deno.serve(async (req: Request) => {
     const pathname: string = new URL(req.url).pathname;
 
@@ -88,6 +94,30 @@ Deno.serve(async (req: Request) => {
         });
     }
 
+    function convertToSamplePost(postModel: PostModel): SamplePost {
+        const createdAt: Date = postModel.createdAt; // 例: 2025-08-21T10:00:00.000Z
+        const year: number = createdAt.getFullYear(); // 年を取得
+        const month: number = createdAt.getMonth() + 1; // 月は0から始まるので1を足す
+        const day: number = createdAt.getDate(); // 日を取得
+        const hours: number = createdAt.getHours(); // 時を取得
+        const minutes: number = createdAt.getMinutes(); // 分を取得
+        const seconds: number = createdAt.getSeconds(); // 秒を取得
+
+        // ゼロ埋め処理
+        const paddedYear: string = String(year).padStart(4, "0");
+        const paddedMonth: string = String(month).padStart(2, "0");
+        const paddedDay: string = String(day).padStart(2, "0");
+        const paddedHours: string = String(hours).padStart(2, "0");
+        const paddedMinutes: string = String(minutes).padStart(2, "0");
+        const paddedSeconds: string = String(seconds).padStart(2, "0");
+        const formattedDate: string =
+            `${paddedYear}-${paddedMonth}-${paddedDay} ${paddedHours}:${paddedMinutes}:${paddedSeconds}`;
+        return {
+            ...postModel,
+            createdAt: formattedDate,
+        };
+    }
+
     if (req.method === "GET" && pathname === "/thread-posts") {
         const threadId: string | null = new URL(req.url).searchParams.get("thread-id");
 
@@ -98,15 +128,26 @@ Deno.serve(async (req: Request) => {
         const kv: Deno.Kv = await Deno.openKv();
         const postList: Deno.KvListIterator<PostModel> = await kv.list({ prefix: [threadId] });
 
-        const threadPosts: PostModel[] = [];
+        const threadPosts: SamplePost[] = [];
         for await (const post of postList) {
-            threadPosts.push(post.value);
+            threadPosts.push(convertToSamplePost(post.value));
         }
 
         return new Response(JSON.stringify(threadPosts), {
             status: 200,
             headers: { "Content-Type": "application/json" },
         });
+    }
+
+    function convertToPostModel(samplePost: SamplePost): PostModel {
+        return {
+            ...samplePost,
+            createdAt: new Date(samplePost.createdAt),
+        };
+    }
+
+    function convertSamplePostsToPostModels(samplePosts: SamplePost[]): PostModel[] {
+        return samplePosts.map(convertToPostModel);
     }
 
     // テスト会話データ作成用のAPI
@@ -118,7 +159,7 @@ Deno.serve(async (req: Request) => {
         }
         const kv: Deno.Kv = await Deno.openKv();
 
-        const posts: PostModel[] = <PostModel[]> samplePosts;
+        const posts: PostModel[] = convertSamplePostsToPostModels(samplePosts);
 
         for (let i = 0; i < posts.length; i++) {
             await kv.set([threadId, i], posts[i]);
