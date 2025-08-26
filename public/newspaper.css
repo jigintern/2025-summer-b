@@ -375,7 +375,7 @@ body {
         .article-body {
             columns: auto 50px;
             column-gap: 1px;
-            column-rule: 0.5px solid #95a5a6;
+            column-rule: 1px solid #95a5a6;
         }
     }
 }
