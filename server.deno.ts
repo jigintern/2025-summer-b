@@ -84,12 +84,12 @@ Deno.serve(async (req: Request) => {
                     "title": selectedTitles[i],
                     "summary": null,
                 });
-                await kv.set([newsUUID, threadUUID], threadList.at(-1));
+                await kv.set([newsUUID, i], threadList.at(-1));
             }
         }
 
         // listをJSONとして返す
-        return new Response(JSON.stringify(threadList), {
+        return new Response(JSON.stringify({ "newspaperUuid": newsUUID, "threads": threadList }), {
             headers: { "Content-Type": "application/json" },
         });
     }
@@ -152,17 +152,30 @@ Deno.serve(async (req: Request) => {
 
     // テスト会話データ作成用のAPI
     if (req.method === "GET" && pathname === "/create-posts") {
-        const threadId: string | null = new URL(req.url).searchParams.get("thread-id");
+        const newspaperId: string | null = new URL(req.url).searchParams.get("newspaper-id");
+        const index: string | null = new URL(req.url).searchParams.get("index");
 
-        if (!threadId) {
-            return new Response("Missing thread-id parameter", { status: 400 });
+        // const threadId: string | null = new URL(req.url).searchParams.get("thread-id");
+
+        if (!newspaperId || !index) {
+            return new Response("Missing newspaper-id parameter", { status: 400 });
         }
         const kv: Deno.Kv = await Deno.openKv();
 
-        const posts: PostModel[] = convertSamplePostsToPostModels(samplePosts);
+        const threadData: Deno.KvEntryMaybe<ThreadModel> = await kv.get([
+            newspaperId,
+            Number(index),
+        ]);
+        if (!threadData.value) {
+            throw new Error("thread data is not found.");
+        }
+        const newThreadData = { ...threadData.value, "title": "オイルショック" };
+        await kv.set([newspaperId, index], newThreadData);
+
+        const posts: PostModel[] = convertSamplePostsToPostModels(samplePosts as SamplePost[]);
 
         for (let i = 0; i < posts.length; i++) {
-            await kv.set([threadId, i], posts[i]);
+            await kv.set([threadData.value.uuid, i], posts[i]);
         }
 
         return new Response("create successful", {
@@ -182,10 +195,17 @@ Deno.serve(async (req: Request) => {
         }
 
         const requestJson = await req.json();
-        const threadId: string = requestJson.uuid;
-        const title: string = requestJson.title;
+        const newspaperId: string = requestJson.uuid;
+        const index = requestJson.index;
 
         const kv: Deno.Kv = await Deno.openKv();
+        const threadData: Deno.KvEntryMaybe<ThreadModel> = await kv.get([newspaperId, index]);
+        if (!threadData.value) {
+            throw new Error("thread data is not found.");
+        }
+        const threadId: string = threadData.value.uuid;
+        const title: string = threadData.value.title;
+        console.log(title);
         const postDataList: Deno.KvListIterator<PostModel> = await kv.list({ prefix: [threadId] });
 
         let postList: string = "";
@@ -199,7 +219,8 @@ Deno.serve(async (req: Request) => {
                 {
                     parts: [
                         {
-                            text: `今から提示するスレッド内の会話を190~200字程度で要約してください。
+                            text:
+                                `今から提示するスレッド内の会話を300字の誤差10文字以内で要約してください。
                   要約するときの文章は、新聞と同じような構成でお願いします。
                   見出しは不要なので、本文のみを生成してください。
                   記事に改行は含まないでください。
@@ -233,14 +254,13 @@ Deno.serve(async (req: Request) => {
 
             const data = await response.json();
             const summary: string = data.candidates[0].content.parts[0].text;
-            const index = requestJson.index;
             const selectedThread: ThreadModel = {
                 "uuid": threadId,
                 "title": title,
                 "summary": summary,
             };
 
-            await kv.set([threadId, index], selectedThread);
+            await kv.set([newspaperId, index], selectedThread);
             return new Response(JSON.stringify(selectedThread), { status: 200 });
         } catch (error) {
             console.error("An error occurred:", error);
