@@ -205,7 +205,6 @@ Deno.serve(async (req: Request) => {
         }
         const threadId: string = threadData.value.uuid;
         const title: string = threadData.value.title;
-        console.log(title);
         const postDataList: Deno.KvListIterator<PostModel> = await kv.list({ prefix: [threadId] });
 
         let postList: string = "";
