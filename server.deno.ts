@@ -184,6 +184,28 @@ Deno.serve(async (req: Request) => {
         });
     }
 
+    // 要約を取得するAPI
+    if (req.method === "GET" && pathname === "/get-summary") {
+        const threadId: string | null = new URL(req.url).searchParams.get("thread-id");
+        const index: string | null = new URL(req.url).searchParams.get("index");
+
+        if (!threadId || !index) {
+            return new Response("Missing thread-id or index parameter", { status: 400 });
+        }
+
+        const kv: Deno.Kv = await Deno.openKv();
+        const summary = await kv.get<ThreadModel>([threadId, index]);
+
+        if (!summary.value) {
+            return new Response("Summary not found", { status: 404 });
+        }
+
+        return new Response(JSON.stringify(summary.value), {
+            status: 200,
+            headers: { "Content-Type": "application/json" },
+        });
+    }
+
     // スレッド内のメッセージを要約するAPI
     if (req.method === "POST" && pathname === "/thread-summary") {
         const API_KEY: string | undefined = Deno.env.get("GOOGLE_API_KEY");
