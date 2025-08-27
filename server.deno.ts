@@ -1,8 +1,8 @@
 import { serveDir } from "jsr:@std/http/file-server";
 import { UUID } from "npm:uuidjs";
 import "https://deno.land/std@0.224.0/dotenv/load.ts";
-import newsList from "./public/data/news.json" with { type: "json" };
-import samplePosts from "./public/data/samplePosts.json" with { type: "json" };
+import newsList from "./api/data/news.json" with { type: "json" };
+import samplePosts from "./api/data/samplePosts.json" with { type: "json" };
 
 type newspaperModel = {
     "uuid": string;
