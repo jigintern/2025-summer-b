@@ -22,4 +22,11 @@ type FormatDatePostModel = {
     createdAt: string;
 };
 
-export type { FormatDatePostModel, NewspaperModel, PostModel, ThreadModel };
+type RegisterPostModel = {
+    threadId: string;
+    userName: string | null;
+    post: string;
+    createdAt: Date;
+};
+
+export type { FormatDatePostModel, NewspaperModel, PostModel, RegisterPostModel, ThreadModel };

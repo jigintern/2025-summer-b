@@ -1,4 +1,4 @@
-import { FormatDatePostModel, PostModel, ThreadModel } from "./models.ts";
+import { FormatDatePostModel, PostModel, RegisterPostModel, ThreadModel } from "./models.ts";
 import { Context } from "https://deno.land/x/hono@v4.3.11/mod.ts";
 import samplePosts from "./data/samplePosts.json" with { type: "json" };
 
@@ -130,4 +130,63 @@ const createThreadPosts = async (ctx: Context) => {
     return ctx.text("create successful");
 };
 
-export { createThreadPosts, getThreadPosts, registerThreadPosts };
+const getWebSocketThreadPosts = async (threadId: string) => {
+    const kv: Deno.Kv = await Deno.openKv();
+    const postList: Deno.KvListIterator<PostModel> = await kv.list({ prefix: [threadId] });
+    const threadPosts: FormatDatePostModel[] = [];
+    for await (const post of postList) {
+        threadPosts.push(convertToSamplePost(post.value));
+    }
+
+    return threadPosts;
+};
+
+const postAndGetUserPost = async (
+    postData: RegisterPostModel,
+    ws: WebSocket,
+    sockets: Set<WebSocket>,
+) => {
+    const threadId: string | null = postData.threadId;
+    const userName: string = postData.userName ?? "名無し";
+    const postContent: string | null = postData.post;
+
+    if (!threadId) {
+        ws.send(JSON.stringify({
+            type: "error",
+            message: "Missing thread-id parameter",
+        }));
+        return;
+    }
+    if (!postContent) {
+        ws.send(JSON.stringify({
+            type: "error",
+            message: "Missing post-content parameter",
+        }));
+        return;
+    }
+
+    // const threadIndex: number | null = Number(threadIndexStr);
+
+    const kv: Deno.Kv = await Deno.openKv();
+
+    const threadPostList: FormatDatePostModel[] = await getWebSocketThreadPosts(threadId);
+    const postsLength: number = threadPostList.length;
+
+    const createdAt: string = new Date().toISOString();
+
+    const post: FormatDatePostModel = { userName, post: postContent, createdAt };
+    threadPostList.push(post);
+    await kv.set([threadId, postsLength], post);
+
+    for (const socket of sockets) {
+        socket.send(JSON.stringify(threadPostList));
+    }
+};
+
+export {
+    createThreadPosts,
+    getThreadPosts,
+    getWebSocketThreadPosts,
+    postAndGetUserPost,
+    registerThreadPosts,
+};

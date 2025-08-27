@@ -1,7 +1,12 @@
-import { Hono } from "https://deno.land/x/hono@v4.3.11/mod.ts";
+import { Context, Hono } from "https://deno.land/x/hono@v4.3.11/mod.ts";
 import { serveStatic } from "https://deno.land/x/hono@v4.3.11/middleware.ts";
 import { getThreadTitles } from "./api/threadList.ts";
-import { createThreadPosts, getThreadPosts } from "./api/threadContent.ts";
+import {
+    createThreadPosts,
+    getThreadPosts,
+    getWebSocketThreadPosts,
+    postAndGetUserPost,
+} from "./api/threadContent.ts";
 import { createThreadSummary } from "./api/newspaperContent.ts";
 
 const app = new Hono();
@@ -39,6 +44,54 @@ app.get("/create-posts", createThreadPosts);
  */
 app.post("/thread-summary", createThreadSummary);
 
+// WebSocket処理
+app.get("/ws/post", (ctx: Context) => {
+    const upgradeHeader = ctx.req.header("Upgrade");
+    if (upgradeHeader !== "websocket") {
+        // WebSocketでなければ、適切なHTTPレスポンスを返す
+        return ctx.text("Expected a WebSocket upgrade request.", 426);
+    }
+    const sockets = new Set<WebSocket>();
+    const threadId: string | undefined = ctx.req.query("thread-id");
+    if (!threadId) {
+        return ctx.text("Missing thread-id parameter", 400);
+    }
+
+    // Denoの標準APIを使ってWebSocketにアップグレード
+    const { response, socket } = Deno.upgradeWebSocket(ctx.req.raw);
+
+    // WebSocketでclientからリクエストされたとき
+    socket.onopen = () => {
+        sockets.add(socket);
+        socket.send(JSON.stringify(getWebSocketThreadPosts(threadId)));
+        console.log("connection opened");
+    };
+
+    // clientからメッセージを受け取ったとき
+    socket.onmessage = (event: MessageEvent) => {
+        try {
+            const data = JSON.parse(event.data);
+            postAndGetUserPost(data, socket, sockets);
+        } catch (e) {
+            console.error("Failed to parse message:", e);
+        }
+    };
+
+    // websocketのconnectionを終了するとき
+    socket.onclose = () => {
+        sockets.delete(socket);
+        console.log("Connection closed");
+    };
+
+    // errorが出たとき
+    socket.onerror = (error: Event) => {
+        console.error("WebSocket error", error);
+    };
+
+    // Honoハンドラからは、アップグレード用のResponseオブジェクトを返す
+    return response;
+});
+
 // 静的ファイル配信
 app.get(
     "*",
@@ -56,4 +109,4 @@ app.get(
     }),
 );
 
-Deno.serve(app.fetch);
+Deno.serve({ port: 8000 }, app.fetch);
