@@ -8,6 +8,7 @@ type ThreadModel = {
     "uuid": string;
     "title": string;
     "summary": string | null;
+    "enable": boolean;
 };
 
 type PostModel = {

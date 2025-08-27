@@ -6,6 +6,7 @@ import {
     getThreadPosts,
     getWebSocketThreadPosts,
     postAndGetUserPost,
+    registerThreadPosts,
 } from "./api/threadContent.ts";
 import { createThreadSummary } from "./api/newspaperContent.ts";
 
@@ -30,7 +31,7 @@ app.get("/thread-posts", getThreadPosts);
  * @param user-id - 投稿するユーザの名前
  * @param post-content - 投稿内容
  */
-app.get("/new-posts");
+app.get("/new-posts", registerThreadPosts);
 
 /**
  * @description テスト用のダミー投稿データを作成するAPI

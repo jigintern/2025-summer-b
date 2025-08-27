@@ -29,6 +29,11 @@ type SamplePost = {
     createdAt: string;
 };
 
+type ThreadData = {
+    title: string;
+    summary: string | null;
+};
+
 Deno.serve(async (req: Request) => {
     const pathname: string = new URL(req.url).pathname;
     const params: URLSearchParams = new URL(req.url).searchParams;
@@ -58,6 +63,9 @@ Deno.serve(async (req: Request) => {
             }
         }
         if (!enableIsTrue) {
+            /*
+             * 開いててまだ新聞ができてないスレッド
+             */
             const runningThreads: Deno.KvListIterator<ThreadModel> = kv.list({
                 prefix: [newspaperUUID],
             });
@@ -326,6 +334,41 @@ Deno.serve(async (req: Request) => {
                 status: 500,
             });
         }
+    }
+    // 要約を取得するAPI
+    if (req.method === "GET" && pathname === "/get-summary") {
+        const newspaperId: string | null = new URL(req.url).searchParams.get("newspaper-id");
+
+        if (!newspaperId) {
+            return new Response("Missing newspaper-id parameter", { status: 400 });
+        }
+        console.log("newspaperId", newspaperId);
+
+        const kv: Deno.Kv = await Deno.openKv();
+        const threads: Deno.KvListIterator<ThreadModel> = kv.list<ThreadModel>({
+            prefix: [
+                newspaperId,
+            ],
+        });
+
+        const titleAndSummaryList: ThreadData[] = [];
+
+        console.log("threads");
+        for await (const thread of threads) {
+            if (!thread.value) {
+                return new Response("threads not found", { status: 404 });
+            }
+            titleAndSummaryList.push({
+                "title": thread.value.title,
+                "summary": thread.value.summary,
+            });
+            console.log(titleAndSummaryList);
+        }
+
+        return new Response(JSON.stringify(titleAndSummaryList), {
+            status: 200,
+            headers: { "Content-Type": "application/json" },
+        });
     }
 
     const threadSockets = new Map<string, Set<WebSocket>>();

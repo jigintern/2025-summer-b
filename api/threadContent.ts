@@ -57,23 +57,35 @@ const getThreadPosts = async (ctx: Context) => {
 };
 
 const registerThreadPosts = async (ctx: Context) => {
-    // const newspaperId: string | undefined = ctx.req.query("newspaper-id");
-    //     const threadIndexStr: string | undefined = ctx.req.query("index");
+    const newspaperId: string | undefined = ctx.req.query("newspaper-id");
+    const threadIndexStr: string | undefined = ctx.req.query("index");
     const threadId: string | undefined = ctx.req.query("thread-id");
     const userName: string = ctx.req.query("user-name") ?? "名無し";
     const postContent: string | undefined = ctx.req.query("post-content");
 
-    // if (!newspaperId || !threadIndexStr) {
-    //     return new Response("Missing newspaper-id or index parameter", { status: 400 });
-    // }
+    if (!newspaperId || !threadIndexStr) {
+        return ctx.json(
+            { "text": "Missing newspaper-id or index parameter", "enoughPosts": false },
+            {
+                status: 400,
+                headers: { "Content-Type": "application/json" },
+            },
+        );
+    }
+    const threadIndex: number | null = Number(threadIndexStr);
+
     if (!threadId) {
-        return ctx.text("Missing thread-id parameter", 400);
+        return ctx.json({ "text": "Missing thread-id parameter", "enoughPosts": false }, {
+            status: 400,
+            headers: { "Content-Type": "application/json" },
+        });
     }
     if (!postContent) {
-        return ctx.text("Missing post-content parameter", 400);
+        return ctx.json({ "text": "Missing post-content parameter", "enoughPosts": false }, {
+            status: 400,
+            headers: { "Content-Type": "application/json" },
+        });
     }
-
-    // const threadIndex: number | null = Number(threadIndexStr);
 
     const kv: Deno.Kv = await Deno.openKv();
 
@@ -95,7 +107,22 @@ const registerThreadPosts = async (ctx: Context) => {
 
     await kv.set([threadId, postsLength + 1], post);
 
-    return ctx.text("create successful", {
+    // 投稿数が必要に達しているか見る
+    let enoughPosts: boolean = false;
+    if (postsLength + 1 >= 20) {
+        const threadData: Deno.KvEntryMaybe<ThreadModel> = await kv.get([
+            newspaperId,
+            threadIndex,
+        ]);
+        if (!threadData.value) {
+            throw ctx.json({ "text": "thread data is not found.", "enoughPosts": false });
+        }
+        const newThreadData = { ...threadData.value, "enable": false };
+        await kv.set([newspaperId, threadIndex], newThreadData);
+        enoughPosts = true;
+    }
+
+    return ctx.json({ "text": "create successful", "enoughPosts": enoughPosts }, {
         status: 200,
         headers: { "Content-Type": "application/json" },
     });
