@@ -20,36 +20,36 @@ app.get("/thread-titles", getThreadTitles);
 
 /**
  * スレッドの投稿一覧を取得するAPI
- * @property thread-id - スレッドが持っているUUID
+ * @param thread-id - スレッドが持っているUUID
  */
 app.get("/thread-posts", getThreadPosts);
 
 /**
  * 新しい投稿を作成するAPI
- * @property thread-id - スレッドが持っているUUID
- * @property user-id - 投稿するユーザの名前
- * @property post-content - 投稿内容
+ * @param thread-id - スレッドが持っているUUID
+ * @param user-id - 投稿するユーザの名前
+ * @param post-content - 投稿内容
  */
 app.get("/new-posts");
 
 /**
  * テスト用のダミー投稿データを作成するAPI
- * @property newspaper-id - 新聞が持っているUUID
- * @property index - ダミー投稿を作成したいスレッドの新聞内のスレッド番号(リストの順番)(0 ~ 4)
+ * @param newspaper-id - 新聞が持っているUUID
+ * @param index - ダミー投稿を作成したいスレッドの新聞内のスレッド番号(リストの順番)(0 ~ 4)
  */
 app.get("/create-posts", createThreadPosts);
 
 /**
  * スレッドの投稿内容を新聞の記事風に要約生成するAPI
- * @property newspaperId - 新聞が持っているUUID
- * @property index - 投稿要約を作成したいスレッドの新聞内のスレッド番号(リストの順番)(0 ~ 4)
+ * @param newspaperId - 新聞が持っているUUID
+ * @param index - 投稿要約を作成したいスレッドの新聞内のスレッド番号(リストの順番)(0 ~ 4)
  */
 app.post("/thread-summary", createThreadSummary);
 
 const threadSockets = new Map<string, Set<WebSocket>>();
 /**
  * WebSocket接続を行い、スレッド内の投稿を反映する
- * @property thread-id - スレッドが持っているUUID
+ * @param thread-id - スレッドが持っているUUID
  */
 app.get("/ws", (ctx: Context) => {
     const upgradeHeader = ctx.req.header("Upgrade");
