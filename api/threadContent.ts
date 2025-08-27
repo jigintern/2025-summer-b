@@ -108,9 +108,8 @@ const registerThreadPosts = async (ctx: Context) => {
     await kv.set([threadId, postsLength + 1], post);
 
     // 投稿数が必要に達しているか見る
-
     let enoughPosts: boolean = false;
-    if (postsLength + 1 >= 5) {
+    if (postsLength + 1 >= 20) {
         const threadData: Deno.KvEntryMaybe<ThreadModel> = await kv.get([
             newspaperId,
             threadIndex,

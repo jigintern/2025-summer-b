@@ -179,8 +179,8 @@
                             }),
                         });
                         const response = await fetch(request);
-                        if(response.status===200){
-                            const responseToJson=await response.json();
+                        if (response.status === 200) {
+                            const responseToJson = await response.json();
                             alert(responseToJson.summary);
                         }
                     }
