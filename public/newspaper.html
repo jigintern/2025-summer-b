@@ -12,56 +12,27 @@
             <div class="parent">
                 <div class="title-container">
                     <div class="newspaper-name-area newspaper-title">ちょべりぐ新聞</div>
-                    <div class="date-area date">2025年8月25日（月曜日）</div>
+                    <div class="date-area date"></div>
                 </div>
                 <div class="article-container-1">
-                    <div class="article-1-content article-body clickable-article">
-                        <p>
-                            政府は本日、新たな経済政策について発表を行った。この政策は中小企業の支援を目的としており、雇用の創出と経済の活性化を目指している。専門家からは「時宜を得た政策」との評価が寄せられている。
-                            具体的な支援内容には、低金利融資制度の拡充や税制優遇措置が含まれており、来年度から段階的に実施される予定だ。
-                            あああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああ
-                        </p>
-                    </div>
-                    <div class="article-1-title headline">経済政策を大幅見直し</div>
+                    <div class="article-1-content article-body clickable-article"></div>
+                    <div class="article-1-title headline"></div>
                 </div>
                 <div class="article-container-2">
-                    <div class="article-2-content article-body clickable-article">
-                        <p>
-                            新技術の導入により、製造業の生産性が大幅に向上している。AI技術の活用により、従来比30％の効率改善が実現された。
-                            ああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああ
-                            ああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああ
-                        </p>
-                    </div>
-                    <div class="article-2-title headline">製造業に革新の波</div>
+                    <div class="article-2-content article-body clickable-article"></div>
+                    <div class="article-2-title headline"></div>
                 </div>
                 <div class="article-container-3">
-                    <div class="article-3-content article-body clickable-article">
-                        <p>
-                            気象庁は本日、台風15号が関東地方に接近していると発表した。明日にかけて暴風雨に警戒が必要とのこと。交通機関への影響も予想されており、外出時は十分な注意が必要だ。
-                            ああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああ
-                        </p>
-                    </div>
-                    <div class="article-3-title headline">台風15号接近中</div>
+                    <div class="article-3-content article-body clickable-article"></div>
+                    <div class="article-3-title headline"></div>
                 </div>
                 <div class="article-container-4">
-                    <div class="article-4-content article-body clickable-article">
-                        <p>
-                            東京オリンピックの開催に向けて、会場の整備が急ピッチで進められている。新国立競技場では最終的な設備チェックが行われており、関係者は万全の体制で臨むと語った。
-                            ああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああ
-                        </p>
-                    </div>
-                    <div class="article-4-title headline">夏季大セール開催中！</div>
+                    <div class="article-4-content article-body clickable-article"></div>
+                    <div class="article-4-title headline"></div>
                 </div>
                 <div class="article-container-5">
-                    <div class="article-5-content article-body clickable-article">
-                        <p>
-                            文部科学省は教育制度の改革案を発表した。デジタル教育の推進と個別最適化学習の導入により、次世代を担う人材育成を目指す。全国の学校で段階的に導入される予定だ。
-                            ああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああ
-                        </p>
-                    </div>
-                    <div class="article-5-title headline">
-                        新築マンション　分譲中！
-                    </div>
+                    <div class="article-5-content article-body clickable-article"></div>
+                    <div class="article-5-title headline"></div>
                 </div>
             </div>
 
@@ -77,6 +48,41 @@
     </body>
 
     <script>
+        const testDate = "2025年8月25日（月）";
+        const testContents = [
+            {
+                "title": "経済政策を大幅見直し",
+                "summary":
+                    `政府は本日、新たな経済政策について発表を行った。この政策は中小企業の支援を目的としており、雇用の創出と経済の活性化を目指している。専門家からは「時宜を得た政策」との評価が寄せられている。
+具体的な支援内容には、低金利融資制度の拡充や税制優遇措置が含まれており、来年度から段階的に実施される予定だ。
+あああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああ`,
+            },
+            {
+                "title": "製造業に革新の波",
+                "summary":
+                    `新技術の導入により、製造業の生産性が大幅に向上している。AI技術の活用により、従来比30％の効率改善が実現された。
+ああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああ
+ああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああ`,
+            },
+            {
+                "title": "台風15号接近中",
+                "summary":
+                    `気象庁は本日、台風15号が関東地方に接近していると発表した。明日にかけて暴風雨に警戒が必要とのこと。交通機関への影響も予想されており、外出時は十分な注意が必要だ。
+ああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああ`,
+            },
+            {
+                "title": "夏季大セール開催中！",
+                "summary":
+                    `東京オリンピックの開催に向けて、会場の整備が急ピッチで進められている。新国立競技場では最終的な設備チェックが行われており、関係者は万全の体制で臨むと語った。
+ああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああ`,
+            },
+            {
+                "title": "新築マンション　分譲中！",
+                "summary":
+                    `文部科学省は教育制度の改革案を発表した。デジタル教育の推進と個別最適化学習の導入により、次世代を担う人材育成を目指す。全国の学校で段階的に導入される予定だ。
+ああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああ`,
+            },
+        ];
         document.addEventListener("DOMContentLoaded", function () {
             const modal = document.getElementById("articleModal");
             const modalTitle = document.getElementById("modalTitle");
@@ -85,12 +91,17 @@
             const clickableArticles = document.getElementsByClassName(
                 "clickable-article",
             );
+            const date = document.getElementsByClassName("date")[0];
+            const articleBodyList = document.getElementsByClassName(
+                "article-body",
+            );
+            const articleHeadlineList = document.getElementsByClassName(
+                "headline",
+            );
 
             // 記事クリック時の処理
             for (let i = 0; i < clickableArticles.length; i++) {
                 clickableArticles[i].addEventListener("click", function () {
-                    // const title = this.getAttribute("data-article-title");
-                    // const content = this.getAttribute("data-article-content");
                     const title = "モーダル見出し";
                     const content =
                         "モーダル内容ああああああああああああああああああああああああああああああああああああああああああああああああ";
@@ -98,8 +109,28 @@
                     modalTitle.textContent = title;
                     modalContent.textContent = content;
                     modal.style.display = "block";
-                    document.body.style.overflow = "hidden"; // スクロール無効化
+                    document.body.style.overflow = "hidden";
                 });
+            }
+
+            date.textContent = testDate;
+
+            for (let i = 0; i < articleBodyList.length; i++) {
+                articleBodyList[i].textContent = "";
+
+                const lines = testContents[i].summary.split("\n").filter((line) =>
+                    line.trim() !== ""
+                );
+
+                lines.forEach((line) => {
+                    const p = document.createElement("p");
+                    p.textContent = line.trim();
+                    articleBodyList[i].appendChild(p);
+                });
+            }
+
+            for (let i = 0; i < articleHeadlineList.length; i++) {
+                articleHeadlineList[i].textContent = testContents[i].title;
             }
 
             // 閉じるボタンクリック時の処理
