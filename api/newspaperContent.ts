@@ -75,6 +75,7 @@ const createThreadSummary = async (ctx: Context) => {
             "uuid": threadId,
             "title": title,
             "summary": summary,
+            "enable": true,
         };
 
         await kv.set([newspaperId, index], selectedThread);
