@@ -140,9 +140,6 @@ Deno.serve(async (req: Request) => {
         }
 
         const posts: Deno.KvListIterator<PostModel> = kv.list({ prefix: [threadData.value.uuid] });
-        console.log("posts: ");
-        console.log(posts);
-        console.log("\n\n");
         const threadPosts: SamplePost[] = [];
         for await (const post of posts) {
             threadPosts.push(convertToSamplePost(post.value));
@@ -196,18 +193,8 @@ Deno.serve(async (req: Request) => {
         }
 
         const posts: Deno.KvListIterator<PostModel> = kv.list({ prefix: [threadData.value.uuid] });
-        console.log("posts: ");
-        console.log(posts);
-        console.log("\n\n");
         let postsLength: number = 0;
-        for await (const post of posts) {
-            postsLength++;
-            console.log("post");
-            console.log(post);
-        }
-        console.log("postsLength: ");
-        console.log(postsLength);
-        console.log("\n\n");
+        for await (const _ of posts) postsLength++;
 
         const createdAt: string = new Date().toISOString();
 
