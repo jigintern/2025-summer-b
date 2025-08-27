@@ -116,15 +116,15 @@
                 titleElement.innerHTML = "";
 
                 try {
-                    const params = new URLSearchParams(document.location.search);
-                    const endpoint = `/thread-posts?thread-id=${params.get("id")}`;
-                    const response = await fetch(endpoint);
-                    const responseToJson = await response.json();
-
                     const span = document.createElement("span"); // タイトルのspanを作成
                     span.innerHTML = params.get("title");
                     titleElement.appendChild(span); // 親要素に追加
 
+                    const endpoint = `/thread-posts?newspaper-id=${
+                        params.get("newspaper-id")
+                    }&index=${params.get("index")}`;
+                    const response = await fetch(endpoint);
+                    const responseToJson = await response.json();
                     renderPosts(responseToJson);
                 } catch (e) {
                     console.log("error: ", e);
@@ -132,43 +132,49 @@
             };
 
             // --- 送信ボタンが押されたときの処理 ---
-            document.getElementById("submitBtn").addEventListener("click", () => {
-                // 入力値を取得
-                const userName = document.getElementById("userName").value.trim();
-                const postContent = document.getElementById("postContent").value
-                    .trim();
+            document.getElementById("submitBtn").addEventListener(
+                "click",
+                async () => {
+                    // 入力値を取得
+                    const getUserName = document.getElementById("userName").value
+                        .trim();
+                    const postContent = document.getElementById("postContent").value
+                        .trim();
 
-                // 入力が空ならアラートを表示して処理を中断
-                if (!postContent) {
-                    alert("投稿内容を入力してください");
-                    return;
-                }
+                    // 名前入力が空なら名前を"名無し"にする
+                    const userName = (getUserName !== "") ? getUserName : "名無し";
 
-                // 現在時刻を投稿時刻として使う
-                const now = new Date();
-                const toStringCreatedAt = now.toLocaleString(); // 例: 2025-08-21T10:00:00.000Z
-                const index = toStringCreatedAt.indexOf(".");
+                    // 入力が空ならアラートを表示して処理を中断
+                    if (!postContent) {
+                        alert("投稿内容を入力してください");
+                        return;
+                    }
 
-                if (index !== -1) {
-                    const result = toStringCreatedAt.slice(0, index);
-                } else {
-                    console.log("検索文字が見つかりませんでした");
-                }
-                const createdAt = toStringCreatedAt.replace("T", " ").slice(
-                    0,
-                    index,
-                ); // 例: 2025/8/21 15:30:00
+                    // 新しい投稿を配列に追加
+                    try {
+                        const endpoint = `/new-posts?newspaper-id=${
+                            params.get("newspaper-id")
+                        }&index=${
+                            params.get("index")
+                        }&user-name=${userName}&post-content=${postContent}`;
+                        const response = await fetch(endpoint);
+                    } catch (e) {
+                        console.log("error: ", e);
+                    }
+                    //posts.push({ userName, post: postContent, createdAt });
 
-                // 新しい投稿を配列に追加
-                posts.push({ userName, post: postContent, createdAt });
+                    // 再描画して新しい投稿を反映
+                    const endpoint = `/thread-posts?newspaper-id=${
+                        params.get("newspaper-id")
+                    }&index=${params.get("index")}`;
+                    const response = await fetch(endpoint);
+                    const responseToJson = await response.json();
+                    renderPosts(responseToJson);
 
-                // 再描画して新しい投稿を反映
-                renderPosts();
-
-                // 入力欄をリセット
-                document.getElementById("userName").value = "";
-                document.getElementById("postContent").value = "";
-            });
+                    // 入力欄をリセット
+                    document.getElementById("postContent").value = "";
+                },
+            );
         </script>
     </body>
 </html>
