@@ -23,4 +23,9 @@ type FormatDatePostModel = {
     createdAt: string;
 };
 
-export type { FormatDatePostModel, NewspaperModel, PostModel, ThreadModel };
+type ThreadData = {
+    title: string;
+    summary: string | null;
+};
+
+export type { FormatDatePostModel, NewspaperModel, PostModel, ThreadData, ThreadModel };

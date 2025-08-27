@@ -2,7 +2,7 @@ import { Hono } from "https://deno.land/x/hono@v4.3.11/mod.ts";
 import { serveStatic } from "https://deno.land/x/hono@v4.3.11/middleware.ts";
 import { getThreadTitles } from "./api/threadList.ts";
 import { createThreadPosts, getThreadPosts, registerThreadPosts } from "./api/threadContent.ts";
-import { createThreadSummary } from "./api/newspaperContent.ts";
+import { createThreadSummary, getThreadSummaryList } from "./api/newspaperContent.ts";
 
 const app = new Hono();
 
@@ -38,6 +38,12 @@ app.get("/create-posts", createThreadPosts);
  * @property index - 投稿要約を作成したいスレッドの新聞内のスレッド番号(リストの順番)(0 ~ 4)
  */
 app.post("/thread-summary", createThreadSummary);
+
+/**
+ * @description 新聞描画用のスレッドの要約を取得するAPI
+ * @param newspaper-id - 新聞が持っているUUID
+ */
+app.get("/get-summary", getThreadSummaryList);
 
 // 静的ファイル配信
 app.get(

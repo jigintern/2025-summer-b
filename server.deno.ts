@@ -31,7 +31,7 @@ type SamplePost = {
 type ThreadData = {
     title: string;
     summary: string | null;
-}
+};
 
 Deno.serve(async (req: Request) => {
     const pathname: string = new URL(req.url).pathname;
@@ -364,7 +364,6 @@ Deno.serve(async (req: Request) => {
             });
             console.log(titleAndSummaryList);
         }
-
 
         return new Response(JSON.stringify(titleAndSummaryList), {
             status: 200,
