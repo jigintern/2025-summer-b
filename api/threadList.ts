@@ -14,7 +14,7 @@ const getThreadTitles = async (ctx: Context) => {
 
     const threadList: ThreadModel[] = [];
 
-    let newsUUID: string = "";
+    let newspaperUUID: string = "";
 
     // list: 条件指定の取得
     const newspapers: Deno.KvListIterator<NewspaperModel> = kv.list({
@@ -25,22 +25,22 @@ const getThreadTitles = async (ctx: Context) => {
     for await (const newspaper of newspapers) {
         if (!newspaper.value.enable) {
             enableIsTrue = false;
-            newsUUID = newspaper.value.uuid;
+            newspaperUUID = newspaper.value.uuid;
             break;
         }
     }
     if (!enableIsTrue) {
         const runningThreads: Deno.KvListIterator<ThreadModel> = kv.list({
-            prefix: [newsUUID],
+            prefix: [newspaperUUID],
         });
 
         for await (const runningThread of runningThreads) {
             threadList.push(runningThread.value);
         }
     } else {
-        newsUUID = UUID.generate();
-        await kv.set(["newspaper", newsUUID], {
-            "uuid": newsUUID,
+        newspaperUUID = UUID.generate();
+        await kv.set(["newspaper", newspaperUUID], {
+            "uuid": newspaperUUID,
             "enable": false,
             "createdAt": null,
         });
@@ -57,12 +57,12 @@ const getThreadTitles = async (ctx: Context) => {
                 "title": selectedTitles[i],
                 "summary": null,
             });
-            await kv.set([newsUUID, i], threadList.at(-1));
+            await kv.set([newspaperUUID, i], threadList.at(-1));
         }
     }
 
     // listをJSONとして返す
-    return ctx.json({ "newspaperUuid": newsUUID, "threads": threadList }, {
+    return ctx.json({ "newspaperUuid": newspaperUUID, "threads": threadList }, {
         headers: { "Content-Type": "application/json" },
     });
 };

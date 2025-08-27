@@ -3,7 +3,7 @@ import { Context } from "https://deno.land/x/hono@v4.3.11/mod.ts";
 import samplePosts from "./data/samplePosts.json" with { type: "json" };
 
 function convertToSamplePost(postModel: PostModel): FormatDatePostModel {
-    const createdAt: Date = postModel.createdAt;
+    const createdAt: Date = new Date(postModel.createdAt);
     const year: number = createdAt.getFullYear();
     const month: number = createdAt.getMonth() + 1;
     const day: number = createdAt.getDate();
@@ -27,6 +27,7 @@ function convertToSamplePost(postModel: PostModel): FormatDatePostModel {
     };
 }
 
+// samplePostのcreatedAtをstringからDateに変換する関数
 function convertToPostModel(samplePost: FormatDatePostModel): PostModel {
     return {
         ...samplePost,
@@ -34,6 +35,7 @@ function convertToPostModel(samplePost: FormatDatePostModel): PostModel {
     };
 }
 
+// samplePostsの要素をすべてconvertToPostModelに送る関数
 function convertSamplePostsToPostModels(samplePosts: FormatDatePostModel[]): PostModel[] {
     return samplePosts.map(convertToPostModel);
 }
@@ -51,7 +53,52 @@ const getThreadPosts = async (ctx: Context) => {
         threadPosts.push(convertToSamplePost(post.value));
     }
 
-    return ctx.json(threadPosts);
+    return ctx.json(threadPosts, { headers: { "Content-Type": "application/json" } });
+};
+
+const registerThreadPosts = async (ctx: Context) => {
+    // const newspaperId: string | undefined = ctx.req.query("newspaper-id");
+    //     const threadIndexStr: string | undefined = ctx.req.query("index");
+    const threadId: string | undefined = ctx.req.query("thread-id");
+    const userName: string = ctx.req.query("user-name") ?? "名無し";
+    const postContent: string | undefined = ctx.req.query("post-content");
+
+    // if (!newspaperId || !threadIndexStr) {
+    //     return new Response("Missing newspaper-id or index parameter", { status: 400 });
+    // }
+    if (!threadId) {
+        return ctx.text("Missing thread-id parameter", 400);
+    }
+    if (!postContent) {
+        return ctx.text("Missing post-content parameter", 400);
+    }
+
+    // const threadIndex: number | null = Number(threadIndexStr);
+
+    const kv: Deno.Kv = await Deno.openKv();
+
+    // const threadData: Deno.KvEntryMaybe<ThreadModel> = await kv.get([
+    //     newspaperId,
+    //     threadIndex,
+    // ]);
+    // if (!threadData.value) {
+    //     throw ctx.text("thread data is not found.");
+    // }
+
+    const posts: Deno.KvListIterator<PostModel> = kv.list({ prefix: [threadId] });
+    let postsLength: number = 0;
+    for await (const _ of posts) postsLength++;
+
+    const createdAt: string = new Date().toISOString();
+
+    const post: FormatDatePostModel = { userName, post: postContent, createdAt };
+
+    await kv.set([threadId, postsLength + 1], post);
+
+    return ctx.text("create successful", {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+    });
 };
 
 const createThreadPosts = async (ctx: Context) => {
@@ -83,4 +130,4 @@ const createThreadPosts = async (ctx: Context) => {
     return ctx.text("create successful");
 };
 
-export { createThreadPosts, getThreadPosts };
+export { createThreadPosts, getThreadPosts, registerThreadPosts };

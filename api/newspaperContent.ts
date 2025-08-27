@@ -24,7 +24,7 @@ const createThreadSummary = async (ctx: Context) => {
 
     const threadId: string = threadData.value.uuid;
     const title: string = threadData.value.title;
-    const postDataList: Deno.KvListIterator<PostModel> = await kv.list({ prefix: [threadId] });
+    const postDataList: Deno.KvListIterator<PostModel> = kv.list({ prefix: [threadId] });
 
     let postList: string = "";
     for await (const postData of postDataList) {
