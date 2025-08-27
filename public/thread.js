@@ -17,10 +17,14 @@ titleElement.textContent = title ? title : "掲示板";
 // --- 4. WebSocket接続を確立 ---
 const wsProtocol = location.protocol === "https:" ? "wss" : "ws";
 const ws = new WebSocket(
-    `${wsProtocol}://${location.host}/ws/post?thread-id=${threadId}`,
+    `${wsProtocol}://${location.host}/ws?thread-id=${threadId}`,
 );
 
 // --- 5. WebSocketのイベントハンドラを設定 ---
+
+ws.onopen = () => {
+    console.log("WebSocket接続成功");
+};
 
 // メッセージ受信時の処理
 ws.onmessage = (event) => {
@@ -32,7 +36,6 @@ ws.onmessage = (event) => {
         renderInitialPosts(data.posts);
     } // 新しい投稿がブロードキャストされてきた場合 (サーバー側の実装に依存)
     else if (data.type === "new_post") {
-        console.log(data.post);
         appendPost(data.post);
     } // エラーメッセージを受信した場合
     else if (data.type === "error") {
@@ -61,23 +64,39 @@ function renderInitialPosts(posts) {
         postsContainer.innerHTML = "<p>まだ投稿はありません。</p>";
         return;
     }
+    console.log(posts);
     posts.forEach(appendPost);
 }
 
 // ひとつの投稿をリストの末尾に追加する関数
-const appendPost = (post) => {
-    const div = document.createElement("div");
-    div.className = "post";
-    div.innerHTML = `
-        <div>
-            <div class="user">${post.userName}</div>
-            <div class="content">${post.post}</div>
-        </div>
-        <div class="date">${post.createdAt}</div>
-    `;
-    postsContainer.appendChild(div);
-    postsContainer.scrollTop = postsContainer.scrollHeight; // 自動で一番下までスクロール
-};
+function appendPost(post) {
+    console.log("post", post);
+    const postDiv = document.createElement("div");
+    postDiv.className = "post";
+
+    const mainContentDiv = document.createElement("div");
+
+    const userDiv = document.createElement("div");
+    userDiv.className = "user";
+    userDiv.textContent = post.userName;
+
+    const contentDiv = document.createElement("div");
+    contentDiv.className = "content";
+    contentDiv.textContent = post.post;
+
+    mainContentDiv.appendChild(userDiv);
+    mainContentDiv.appendChild(contentDiv);
+
+    const dateDiv = document.createElement("div");
+    dateDiv.className = "date";
+    dateDiv.textContent = post.createdAt;
+
+    postDiv.appendChild(mainContentDiv);
+    postDiv.appendChild(dateDiv);
+
+    postsContainer.appendChild(postDiv);
+    postsContainer.scrollTop = postsContainer.scrollHeight;
+}
 
 submitBtn.addEventListener("click", () => {
     const userName = userNameInput.value.trim() || "名無し";

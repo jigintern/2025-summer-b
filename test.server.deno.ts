@@ -1,5 +1,5 @@
 import { Context, Hono } from "https://deno.land/x/hono@v4.3.11/mod.ts";
-import { serveStatic } from "https://deno.land/x/hono@v4.3.11/middleware.ts";
+import { logger, serveStatic } from "https://deno.land/x/hono@v4.3.11/middleware.ts";
 import { getThreadTitles } from "./api/threadList.ts";
 import {
     createThreadPosts,
@@ -10,6 +10,8 @@ import {
 import { createThreadSummary } from "./api/newspaperContent.ts";
 
 const app = new Hono();
+
+app.use("*", logger());
 
 /**
  * スレッドのタイトル一覧を取得するAPI
@@ -49,8 +51,7 @@ const threadSockets = new Map<string, Set<WebSocket>>();
  * WebSocket接続を行い、スレッド内の投稿を反映する
  * @property thread-id - スレッドが持っているUUID
  */
-app.get("/ws/post", (ctx: Context) => {
-    const sockets = new Set<WebSocket>();
+app.get("/ws", (ctx: Context) => {
     const upgradeHeader = ctx.req.header("Upgrade");
     if (upgradeHeader !== "websocket") {
         // WebSocketでなければ、適切なHTTPレスポンスを返す
@@ -96,6 +97,7 @@ app.get("/ws/post", (ctx: Context) => {
 
     // websocketのconnectionを終了するとき
     socket.onclose = () => {
+        const sockets = threadSockets.get(threadId);
         if (sockets) {
             sockets.delete(socket);
             console.log(

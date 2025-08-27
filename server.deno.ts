@@ -3,6 +3,7 @@ import { UUID } from "npm:uuidjs";
 import "https://deno.land/std@0.224.0/dotenv/load.ts";
 import newsList from "./api/data/news.json" with { type: "json" };
 import samplePosts from "./api/data/samplePosts.json" with { type: "json" };
+import { getWebSocketThreadPosts, postAndGetUserPost } from "./api/threadContent.ts";
 
 type newspaperModel = {
     "uuid": string;
@@ -325,6 +326,74 @@ Deno.serve(async (req: Request) => {
                 status: 500,
             });
         }
+    }
+
+    const threadSockets = new Map<string, Set<WebSocket>>();
+    const isWebSocket = req.headers.get("upgrade")?.toLowerCase() === "websocket";
+    if (isWebSocket) {
+        const threadId: string | null = new URL(req.url).searchParams.get("thread-id");
+        if (!threadId) {
+            return new Response("Missing thread-id parameter", { status: 400 });
+        }
+
+        // Denoの標準APIを使ってWebSocketにアップグレード
+        const { response, socket } = Deno.upgradeWebSocket(req);
+
+        // WebSocketでclientからリクエストされたとき
+        socket.onopen = async () => {
+            let sockets = threadSockets.get(threadId);
+            if (!sockets) {
+                sockets = new Set<WebSocket>();
+                threadSockets.set(threadId, sockets);
+            }
+            sockets.add(socket);
+            console.log(
+                `Connection opened for thread: ${threadId}. Total connections for this thread: ${sockets.size}`,
+            );
+
+            // 接続時にスレッドの投稿リストを取得してクライアントに送信
+            const posts = await getWebSocketThreadPosts(threadId);
+            socket.send(JSON.stringify({ type: "start", posts: posts }));
+        };
+
+        // clientからメッセージを受け取ったとき
+        socket.onmessage = (event: MessageEvent) => {
+            try {
+                const data = JSON.parse(event.data);
+                console.log(data);
+                console.log("aaaaaaaaa");
+                const socketsForThread = threadSockets.get(threadId);
+                if (socketsForThread) {
+                    postAndGetUserPost(data, socket, socketsForThread);
+                }
+            } catch (e) {
+                console.error("Failed to parse message:", e);
+            }
+        };
+
+        // websocketのconnectionを終了するとき
+        socket.onclose = () => {
+            const sockets = threadSockets.get(threadId);
+            if (sockets) {
+                sockets.delete(socket);
+                console.log(
+                    `Connection closed for thread: ${threadId}. Remaining connections: ${sockets.size}`,
+                );
+                // このスレッドの接続が0になったら、Mapからキーごと削除
+                if (sockets.size === 0) {
+                    threadSockets.delete(threadId);
+                    console.log(`Thread ${threadId} removed from map.`);
+                }
+            }
+        };
+
+        // errorが出たとき
+        socket.onerror = (error: Event) => {
+            console.error("WebSocket error", error);
+        };
+
+        // Honoハンドラからは、アップグレード用のResponseオブジェクトを返す
+        return response;
     }
 
     return serveDir(req, {
