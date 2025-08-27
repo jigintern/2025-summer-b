@@ -2,7 +2,6 @@
 <html>
     <head>
         <meta charset="utf-8">
-        <!--表示領域を端末の幅に合わせる-->
         <meta name="viewport" content="width=device-width" , initial-scale="1">
         <link rel="stylesheet" href="style-bbs.css">
         <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -12,29 +11,37 @@
             rel="stylesheet"
         >
 
-        <title>掲示板一覧</title>
+        <title>掲示板一覧と新聞一覧</title>
     </head>
 
     <body>
-        <h1>掲示板一覧</h1>
+        <div class="list-container">
+            <div class="bbs-container">
+                <h1>掲示板一覧</h1>
+                <ul id="bbs-list"></ul>
+            </div>
 
-        <ul id="bbs-list"></ul>
+            <div class="newspaper-container">
+                <h1>新聞一覧</h1>
+                <ul id="newspaper-list"></ul>
+            </div>
+        </div>
     </body>
 
     <script>
+        // 掲示板一覧を表示するエリア
         const bbsContainer = document.getElementById("bbs-list");
 
         let bbsList = [];
 
-        function renderBbs(threadList) {
-            // いったん中身をクリア
+        function renderBbs(responseToJson) {
             bbsContainer.innerHTML = "";
             // 配列の内容を順に表示
             if (threadList) {
                 bbsList = threadList;
             }
             bbsList.forEach((p) => {
-                const li = document.createElement("li"); // 投稿全体のdivを作成
+                const li = document.createElement("li"); // <li></li>を作成
                 li.className = "bbs"; // CSS用クラスを付与
                 const a = document.createElement("a"); // <a></a>を作成
                 a.href = `thread.html?id=${p.id}&title=${p.name}`; // <a href="thread.html?id=1?title=掲示板1"></a>
@@ -44,19 +51,43 @@
             });
         }
 
-        // greetingを叩くためのjavascriptの実装
+        // ページ読み込み時に掲示板一覧を取得して表示
         window.onload = async () => {
             try {
                 const response = await fetch("/thread-titles");
                 const responseToJson = await response.json();
-                const threadList = responseToJson.map((thread, i) => ({
-                    id: i + 1,
-                    name: thread.title,
-                }));
-                renderBbs(threadList);
+
+                renderBbs(responseToJson.threads);
+                renderNewspaper(responseToJson.newspapers);
             } catch (e) {
                 console.log("error: ", e);
             }
         };
+
+        // 新聞一覧を表示するエリア
+        const newspaperContainer = document.getElementById("newspaper-list");
+
+        let newspaperList = ["newspaper"];
+
+        function renderNewspaper(responseToJson) {
+            newspaperContainer.innerHTML = "";
+
+            // const newsList = responseToJson.map((news) => ({
+            // }));
+
+            // if (newsList) {
+            //     newspaperList = newsList;
+            // }
+            newspaperList.forEach((p) => {
+                const li = document.createElement("li");
+                li.className = "newspaper";
+                const a = document.createElement("a");
+                a.href = "http://localhost:8000/newspaper.html"; // <a href="https://www3.nhk.or.jp/news/easy/"></a>
+
+                a.textContent = p;
+                li.appendChild(a);
+                newspaperContainer.appendChild(li);
+            });
+        }
     </script>
 </html>
