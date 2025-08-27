@@ -24,14 +24,11 @@
     <script>
         const bbsContainer = document.getElementById("bbs-list");
 
-        let bbsList = [];
-
         function renderBbs(responseToJson) {
             // いったん中身をクリア
             bbsContainer.innerHTML = "";
 
-            const threadList = responseToJson.map((thread) => ({
-                id: thread.uuid,
+            const threadList = responseToJson.threads.map((thread) => ({
                 name: thread.title,
             }));
 
@@ -39,7 +36,7 @@
             if (threadList) {
                 bbsList = threadList;
             }
-            bbsList.forEach((p) => {
+            bbsList.forEach((p, index) => {
                 const li = document.createElement("li"); // 投稿全体のdivを作成
                 li.className = "bbs"; // CSS用クラスを付与
                 const a = document.createElement("a"); // <a></a>を作成
@@ -55,8 +52,7 @@
             try {
                 const response = await fetch("/thread-titles");
                 const responseToJson = await response.json();
-
-                renderBbs(responseToJson.threads);
+                renderBbs(responseToJson);
             } catch (e) {
                 console.log("error: ", e);
             }
