@@ -136,10 +136,13 @@
                 "click",
                 async () => {
                     // 入力値を取得
-                    const userName = document.getElementById("userName").value
+                    const getUserName = document.getElementById("userName").value
                         .trim();
                     const postContent = document.getElementById("postContent").value
                         .trim();
+
+                    // 名前入力が空なら名前を"名無し"にする
+                    const userName = (getUserName !== "") ? getUserName : "名無し";
 
                     // 入力が空ならアラートを表示して処理を中断
                     if (!postContent) {

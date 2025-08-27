@@ -171,7 +171,7 @@ Deno.serve(async (req: Request) => {
     if (req.method === "GET" && pathname === "/new-posts") {
         const newspaperId: string | null = new URL(req.url).searchParams.get("newspaper-id");
         const threadIndexStr: string | null = new URL(req.url).searchParams.get("index");
-        const userName: string = params.get("user-name")??"名無し";
+        const userName: string = params.get("user-name") ?? "名無し";
         const postContent: string | null = params.get("post-content");
 
         // const threadId: string | null = new URL(req.url).searchParams.get("thread-id");
