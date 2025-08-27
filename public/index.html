@@ -36,6 +36,12 @@
 
         function renderBbs(responseToJson) {
             bbsContainer.innerHTML = "";
+
+            const threadList = responseToJson.threads.map((thread) => ({
+                id: thread.id,
+                name: thread.title,
+            }));
+
             // 配列の内容を順に表示
             if (threadList) {
                 bbsList = threadList;
@@ -67,9 +73,8 @@
         // 新聞一覧を表示するエリア
         const newspaperContainer = document.getElementById("newspaper-list");
 
-        let newspaperList = ["newspaper"];
-
         function renderNewspaper(responseToJson) {
+            let newspaperList = ["newspaper"];
             newspaperContainer.innerHTML = "";
 
             // const newsList = responseToJson.map((news) => ({
@@ -82,7 +87,7 @@
                 const li = document.createElement("li");
                 li.className = "newspaper";
                 const a = document.createElement("a");
-                a.href = "http://localhost:8000/newspaper.html"; // <a href="https://www3.nhk.or.jp/news/easy/"></a>
+                a.href = "http://localhost:8000/newspaper.html"; 
 
                 a.textContent = p;
                 li.appendChild(a);

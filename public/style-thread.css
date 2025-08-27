@@ -1,61 +1,59 @@
 body {
-  font-family: "DotGothic16", sans-serif;
-  font-weight: 400;
-  font-style: normal;
-  background-color: #fff;
-  color: #000;
+    font-family: "DotGothic16", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+    background-color: #fff;
+    color: #000;
 
-  margin: 0;
-  padding: 20px;
-  font-size: 14px;
-  line-height: 1.6;
+    margin: 0;
+    padding: 20px;
+    font-size: 14px;
+    line-height: 1.6;
 }
 
 .post {
-  border-bottom: 1px solid #ccc;
-  padding: 6px 0;
-  margin: 0;
-  border-radius: 0;
-  display: flex;
-  justify-content: space-between;
+    border-bottom: 1px solid #ccc;
+    padding: 6px 0;
+    margin: 0;
+    border-radius: 0;
+    display: flex;
+    justify-content: space-between;
 }
 
 .post .user {
-  font-weight: bold;
-  color: #008000;
-  margin-right: 6px;
+    font-weight: bold;
+    color: #008000;
+    margin-right: 6px;
 }
 
 .post .date {
-  font-size: 0.9em;
-  color: #666;
-  margin-top: 4px;
-  white-space: pre-wrap;
-  align-self: flex-end;
+    font-size: 0.9em;
+    color: #666;
+    margin-top: 4px;
+    white-space: pre-wrap;
+    align-self: flex-end;
 }
-
-
 
 /* 入力フォームをページ下に配置 */
 .form-container {
-  margin-top: 30px;
-  padding: 10px 0;
-  border-top: 2px solid #ccc;
+    margin-top: 30px;
+    padding: 10px 0;
+    border-top: 2px solid #ccc;
 }
 
 .form-container input,
 .form-container textarea {
-  font-family: "DotGothic16", sans-serif;
-  width: 100%;
-  padding: 8px;
-  margin-bottom: 10px;
-  box-sizing: border-box;
+    font-family: "DotGothic16", sans-serif;
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 10px;
+    box-sizing: border-box;
 }
 
 ::placeholder {
-  font-family: "DotGothic16", sans-serif;
-  font-weight: 400;
-  font-style: normal;
+    font-family: "DotGothic16", sans-serif;
+    font-weight: 400;
+    font-style: normal;
 }
 
 /* .form-container button {
@@ -65,26 +63,26 @@ body {
 
 /* 昔のHTML風ボタンスタイル */
 button {
-  background-color: #c0c0c0;
-  border: 2px outset #c0c0c0;
-  color: #000000;
-  font-family: "DotGothic16", sans-serif;
-  font-size: 12px;
-  padding: 4px 12px;
-  cursor: pointer;
-  box-shadow: none;
+    background-color: #c0c0c0;
+    border: 2px outset #c0c0c0;
+    color: #000000;
+    font-family: "DotGothic16", sans-serif;
+    font-size: 12px;
+    padding: 4px 12px;
+    cursor: pointer;
+    box-shadow: none;
 }
 
 button:hover {
-  background-color: #d4d0c8;
+    background-color: #d4d0c8;
 }
 
 button:active {
-  border: 2px inset #c0c0c0;
-  background-color: #a0a0a0;
+    border: 2px inset #c0c0c0;
+    background-color: #a0a0a0;
 }
 
 button:focus {
-  outline: 1px dotted #000000;
-  outline-offset: -4px;
+    outline: 1px dotted #000000;
+    outline-offset: -4px;
 }
