@@ -1,7 +1,7 @@
 import { Hono } from "https://deno.land/x/hono@v4.3.11/mod.ts";
 import { serveStatic } from "https://deno.land/x/hono@v4.3.11/middleware.ts";
 import { getThreadTitles } from "./api/threadList.ts";
-import { createThreadPosts, getThreadPosts } from "./api/threadContent.ts";
+import { createThreadPosts, getThreadPosts, registerThreadPosts } from "./api/threadContent.ts";
 import { createThreadSummary } from "./api/newspaperContent.ts";
 
 const app = new Hono();
@@ -23,7 +23,7 @@ app.get("/thread-posts", getThreadPosts);
  * @property user-id - 投稿するユーザの名前
  * @property post-content - 投稿内容
  */
-app.get("/new-posts");
+app.get("/new-posts", registerThreadPosts);
 
 /**
  * テスト用のダミー投稿データを作成するAPI
