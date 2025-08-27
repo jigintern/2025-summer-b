@@ -13,7 +13,8 @@ const createThreadSummary = async (ctx: Context) => {
 
     const requestJson = await ctx.req.json();
     const newspaperId: string = requestJson.uuid;
-    const index: number = requestJson.index;
+    const indexStr: string = requestJson.index;
+    const index: number = Number(indexStr);
 
     const kv: Deno.Kv = await Deno.openKv();
     const threadData: Deno.KvEntryMaybe<ThreadModel> = await kv.get([newspaperId, index]);
