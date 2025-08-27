@@ -165,8 +165,6 @@ const postAndGetUserPost = async (
         return;
     }
 
-    // const threadIndex: number | null = Number(threadIndexStr);
-
     const kv: Deno.Kv = await Deno.openKv();
 
     const threadPostList: FormatDatePostModel[] = await getWebSocketThreadPosts(threadId);
@@ -174,12 +172,15 @@ const postAndGetUserPost = async (
 
     const createdAt: string = new Date().toISOString();
 
-    const post: FormatDatePostModel = { userName, post: postContent, createdAt };
-    threadPostList.push(post);
+    const post: FormatDatePostModel = {
+        userName: userName,
+        post: postContent,
+        createdAt: createdAt,
+    };
     await kv.set([threadId, postsLength], post);
 
     for (const socket of sockets) {
-        socket.send(JSON.stringify(threadPostList));
+        socket.send(JSON.stringify({ type: "new_post", post: post }));
     }
 };
 

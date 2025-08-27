@@ -29,6 +29,7 @@
             bbsContainer.innerHTML = "";
 
             const threadList = responseToJson.threads.map((thread) => ({
+                id: thread.uuid,
                 name: thread.title,
             }));
 

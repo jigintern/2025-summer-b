@@ -44,14 +44,18 @@ app.get("/create-posts", createThreadPosts);
  */
 app.post("/thread-summary", createThreadSummary);
 
-// WebSocket処理
+const threadSockets = new Map<string, Set<WebSocket>>();
+/**
+ * WebSocket接続を行い、スレッド内の投稿を反映する
+ * @property thread-id - スレッドが持っているUUID
+ */
 app.get("/ws/post", (ctx: Context) => {
+    const sockets = new Set<WebSocket>();
     const upgradeHeader = ctx.req.header("Upgrade");
     if (upgradeHeader !== "websocket") {
         // WebSocketでなければ、適切なHTTPレスポンスを返す
         return ctx.text("Expected a WebSocket upgrade request.", 426);
     }
-    const sockets = new Set<WebSocket>();
     const threadId: string | undefined = ctx.req.query("thread-id");
     if (!threadId) {
         return ctx.text("Missing thread-id parameter", 400);
@@ -61,17 +65,30 @@ app.get("/ws/post", (ctx: Context) => {
     const { response, socket } = Deno.upgradeWebSocket(ctx.req.raw);
 
     // WebSocketでclientからリクエストされたとき
-    socket.onopen = () => {
+    socket.onopen = async () => {
+        let sockets = threadSockets.get(threadId);
+        if (!sockets) {
+            sockets = new Set<WebSocket>();
+            threadSockets.set(threadId, sockets);
+        }
         sockets.add(socket);
-        socket.send(JSON.stringify(getWebSocketThreadPosts(threadId)));
-        console.log("connection opened");
+        console.log(
+            `Connection opened for thread: ${threadId}. Total connections for this thread: ${sockets.size}`,
+        );
+
+        // 接続時にスレッドの投稿リストを取得してクライアントに送信
+        const posts = await getWebSocketThreadPosts(threadId);
+        socket.send(JSON.stringify({ type: "start", posts: posts }));
     };
 
     // clientからメッセージを受け取ったとき
     socket.onmessage = (event: MessageEvent) => {
         try {
             const data = JSON.parse(event.data);
-            postAndGetUserPost(data, socket, sockets);
+            const socketsForThread = threadSockets.get(threadId);
+            if (socketsForThread) {
+                postAndGetUserPost(data, socket, socketsForThread);
+            }
         } catch (e) {
             console.error("Failed to parse message:", e);
         }
@@ -79,8 +96,17 @@ app.get("/ws/post", (ctx: Context) => {
 
     // websocketのconnectionを終了するとき
     socket.onclose = () => {
-        sockets.delete(socket);
-        console.log("Connection closed");
+        if (sockets) {
+            sockets.delete(socket);
+            console.log(
+                `Connection closed for thread: ${threadId}. Remaining connections: ${sockets.size}`,
+            );
+            // このスレッドの接続が0になったら、Mapからキーごと削除
+            if (sockets.size === 0) {
+                threadSockets.delete(threadId);
+                console.log(`Thread ${threadId} removed from map.`);
+            }
+        }
     };
 
     // errorが出たとき
