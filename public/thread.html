@@ -66,6 +66,9 @@
         <script>
             const queryString = window.location.search;
             const params = new URLSearchParams(queryString);
+            const newspaperId = params.get("newspaper-id");
+            const threadIndex = params.get("index");
+            const threadId = params.get("thread-id");
             const title = params.get("title");
 
             const titleElement = document.getElementById("title");
@@ -117,12 +120,11 @@
 
                 try {
                     const span = document.createElement("span"); // タイトルのspanを作成
-                    span.innerHTML = params.get("title");
+                    span.innerHTML = title;
                     titleElement.appendChild(span); // 親要素に追加
 
-                    const endpoint = `/thread-posts?newspaper-id=${
-                        params.get("newspaper-id")
-                    }&index=${params.get("index")}`;
+                    const endpoint = `/thread-posts` +
+                        `?thread-id=${threadId}`;
                     const response = await fetch(endpoint);
                     const responseToJson = await response.json();
                     renderPosts(responseToJson);
@@ -150,23 +152,42 @@
                         return;
                     }
 
+                    let enoughPosts = false;
                     // 新しい投稿を配列に追加
                     try {
-                        const endpoint = `/new-posts?newspaper-id=${
-                            params.get("newspaper-id")
-                        }&index=${
-                            params.get("index")
-                        }&user-name=${userName}&post-content=${postContent}`;
+                        const endpoint = `/new-posts` +
+                            `?newspaper-id=${newspaperId}` +
+                            `&index=${threadIndex}` +
+                            `&thread-id=${threadId}` +
+                            `&user-name=${userName}` +
+                            `&post-content=${postContent}`;
                         const response = await fetch(endpoint);
+                        const responseToJson = await response.json();
+                        enoughPosts = responseToJson.enoughPosts;
                     } catch (e) {
                         console.log("error: ", e);
                     }
                     //posts.push({ userName, post: postContent, createdAt });
 
+                    if (enoughPosts) {
+                        const endpoint = `thread-summary` +
+                            `?`;
+
+                        const request = new Request("/thread-summary", {
+                            method: "POST",
+                            body: JSON.stringify({
+                                "uuid": threadId,
+                                "title": title,
+                                "index": threadIndex,
+                            }),
+                        });
+                        const response = await fetch(request);
+                        console.log(response);
+                    }
+
                     // 再描画して新しい投稿を反映
-                    const endpoint = `/thread-posts?newspaper-id=${
-                        params.get("newspaper-id")
-                    }&index=${params.get("index")}`;
+                    const endpoint = `/thread-posts` +
+                        `?thread-id=${threadId}`;
                     const response = await fetch(endpoint);
                     const responseToJson = await response.json();
                     renderPosts(responseToJson);
