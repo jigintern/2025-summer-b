@@ -14,18 +14,18 @@ const app = new Hono();
 app.use("*", logger());
 
 /**
- * スレッドのタイトル一覧を取得するAPI
+ * @description スレッドのタイトル一覧を取得するAPI
  */
 app.get("/thread-titles", getThreadTitles);
 
 /**
- * スレッドの投稿一覧を取得するAPI
+ * @description スレッドの投稿一覧を取得するAPI
  * @param thread-id - スレッドが持っているUUID
  */
 app.get("/thread-posts", getThreadPosts);
 
 /**
- * 新しい投稿を作成するAPI
+ * @description 新しい投稿を作成するAPI
  * @param thread-id - スレッドが持っているUUID
  * @param user-id - 投稿するユーザの名前
  * @param post-content - 投稿内容
@@ -33,14 +33,14 @@ app.get("/thread-posts", getThreadPosts);
 app.get("/new-posts");
 
 /**
- * テスト用のダミー投稿データを作成するAPI
+ * @description テスト用のダミー投稿データを作成するAPI
  * @param newspaper-id - 新聞が持っているUUID
  * @param index - ダミー投稿を作成したいスレッドの新聞内のスレッド番号(リストの順番)(0 ~ 4)
  */
 app.get("/create-posts", createThreadPosts);
 
 /**
- * スレッドの投稿内容を新聞の記事風に要約生成するAPI
+ * @description スレッドの投稿内容を新聞の記事風に要約生成するAPI
  * @param newspaperId - 新聞が持っているUUID
  * @param index - 投稿要約を作成したいスレッドの新聞内のスレッド番号(リストの順番)(0 ~ 4)
  */
@@ -48,7 +48,7 @@ app.post("/thread-summary", createThreadSummary);
 
 const threadSockets = new Map<string, Set<WebSocket>>();
 /**
- * WebSocket接続を行い、スレッド内の投稿を反映する
+ * @description WebSocket接続を行い、スレッド内の投稿を反映する
  * @param thread-id - スレッドが持っているUUID
  */
 app.get("/ws", (ctx: Context) => {
