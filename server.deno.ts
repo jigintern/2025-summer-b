@@ -30,7 +30,9 @@ type SamplePost = {
 
 Deno.serve(async (req: Request) => {
     const pathname: string = new URL(req.url).pathname;
+    const params: URLSearchParams = new URL(req.url).searchParams;
 
+    // 掲示板一覧を取得するAPI
     if (req.method === "GET" && pathname === "/thread-titles") {
         const shuffleArray = (arr: string[]) => arr.sort(() => Math.random() - Math.random());
 
@@ -41,33 +43,29 @@ Deno.serve(async (req: Request) => {
 
         const threadList: ThreadModel[] = [];
 
-        let newsUUID: string = "";
+        let newspaperUUID: string = "";
 
         // list: 条件指定の取得
-        const newspapers: Deno.KvListIterator<newspaperModel> = kv.list({
-            prefix: ["newspaper"],
-        });
+        const newspapers: Deno.KvListIterator<newspaperModel> = kv.list({ prefix: ["newspaper"] });
 
         let enableIsTrue: boolean = true;
         for await (const newspaper of newspapers) {
             if (!newspaper.value.enable) {
                 enableIsTrue = false;
-                newsUUID = newspaper.value.uuid;
+                newspaperUUID = newspaper.value.uuid;
                 break;
             }
         }
         if (!enableIsTrue) {
             const runningThreads: Deno.KvListIterator<ThreadModel> = kv.list({
-                prefix: [newsUUID],
+                prefix: [newspaperUUID],
             });
 
-            for await (const runningThread of runningThreads) {
-                threadList.push(runningThread.value);
-            }
+            for await (const runningThread of runningThreads) threadList.push(runningThread.value);
         } else {
-            newsUUID = UUID.generate();
-            await kv.set(["newspaper", newsUUID], {
-                "uuid": newsUUID,
+            newspaperUUID = UUID.generate();
+            await kv.set(["newspaper", newspaperUUID], {
+                "uuid": newspaperUUID,
                 "enable": false,
                 "createdAt": null,
             });
@@ -84,18 +82,20 @@ Deno.serve(async (req: Request) => {
                     "title": selectedTitles[i],
                     "summary": null,
                 });
-                await kv.set([newsUUID, i], threadList.at(-1));
+                await kv.set([newspaperUUID, i], threadList.at(-1));
             }
         }
 
         // listをJSONとして返す
-        return new Response(JSON.stringify({ "newspaperUuid": newsUUID, "threads": threadList }), {
-            headers: { "Content-Type": "application/json" },
-        });
+        return new Response(
+            JSON.stringify({ "newspaperUuid": newspaperUUID, "threads": threadList }),
+            { headers: { "Content-Type": "application/json" } },
+        );
     }
 
+    // postModelのcreatedAtをDateからstringに変換する関数
     function convertToSamplePost(postModel: PostModel): SamplePost {
-        const createdAt: Date = postModel.createdAt; // 例: 2025-08-21T10:00:00.000Z
+        const createdAt: Date = new Date(postModel.createdAt); // 例: 2025-08-21T10:00:00.000Z
         const year: number = createdAt.getFullYear(); // 年を取得
         const month: number = createdAt.getMonth() + 1; // 月は0から始まるので1を足す
         const day: number = createdAt.getDate(); // 日を取得
@@ -118,18 +118,33 @@ Deno.serve(async (req: Request) => {
         };
     }
 
+    // 掲示板の投稿を取得するAPI
     if (req.method === "GET" && pathname === "/thread-posts") {
-        const threadId: string | null = new URL(req.url).searchParams.get("thread-id");
+        const newspaperId: string | null = params.get("newspaper-id");
+        const threadIndexStr: string | null = params.get("index");
 
-        if (!threadId) {
-            return new Response("Missing thread-id parameter", { status: 400 });
+        if (!newspaperId || !threadIndexStr) {
+            return new Response("Missing newspaper-id parameter", { status: 400 });
         }
 
-        const kv: Deno.Kv = await Deno.openKv();
-        const postList: Deno.KvListIterator<PostModel> = await kv.list({ prefix: [threadId] });
+        const threadIndex: number | null = Number(threadIndexStr);
 
+        const kv: Deno.Kv = await Deno.openKv();
+
+        const threadData: Deno.KvEntryMaybe<ThreadModel> = await kv.get([
+            newspaperId,
+            threadIndex,
+        ]);
+        if (!threadData.value) {
+            throw new Error("thread data is not found.");
+        }
+
+        const posts: Deno.KvListIterator<PostModel> = kv.list({ prefix: [threadData.value.uuid] });
+        console.log("posts: ");
+        console.log(posts);
+        console.log("\n\n");
         const threadPosts: SamplePost[] = [];
-        for await (const post of postList) {
+        for await (const post of posts) {
             threadPosts.push(convertToSamplePost(post.value));
         }
 
@@ -139,6 +154,7 @@ Deno.serve(async (req: Request) => {
         });
     }
 
+    // samplePostのcreatedAtをstringからDateに変換する関数
     function convertToPostModel(samplePost: SamplePost): PostModel {
         return {
             ...samplePost,
@@ -146,8 +162,63 @@ Deno.serve(async (req: Request) => {
         };
     }
 
+    // samplePostsの要素をすべてconvertToPostModelに送る関数
     function convertSamplePostsToPostModels(samplePosts: SamplePost[]): PostModel[] {
         return samplePosts.map(convertToPostModel);
+    }
+
+    // 新しい投稿を作成するのAPI
+    if (req.method === "GET" && pathname === "/new-posts") {
+        const newspaperId: string | null = new URL(req.url).searchParams.get("newspaper-id");
+        const threadIndexStr: string | null = new URL(req.url).searchParams.get("index");
+        const userName: string = params.get("user-name")??"名無し";
+        const postContent: string | null = params.get("post-content");
+
+        // const threadId: string | null = new URL(req.url).searchParams.get("thread-id");
+
+        if (!newspaperId || !threadIndexStr) {
+            return new Response("Missing newspaper-id or index parameter", { status: 400 });
+        }
+        if (!postContent) {
+            return new Response("Missing post-content parameter", { status: 400 });
+        }
+
+        const threadIndex: number | null = Number(threadIndexStr);
+
+        const kv: Deno.Kv = await Deno.openKv();
+
+        const threadData: Deno.KvEntryMaybe<ThreadModel> = await kv.get([
+            newspaperId,
+            threadIndex,
+        ]);
+        if (!threadData.value) {
+            throw new Error("thread data is not found.");
+        }
+
+        const posts: Deno.KvListIterator<PostModel> = kv.list({ prefix: [threadData.value.uuid] });
+        console.log("posts: ");
+        console.log(posts);
+        console.log("\n\n");
+        let postsLength: number = 0;
+        for await (const post of posts) {
+            postsLength++;
+            console.log("post");
+            console.log(post);
+        }
+        console.log("postsLength: ");
+        console.log(postsLength);
+        console.log("\n\n");
+
+        const createdAt: string = new Date().toISOString();
+
+        const post: SamplePost = { userName, post: postContent, createdAt };
+
+        await kv.set([threadData.value.uuid, postsLength + 1], post);
+
+        return new Response("create successful", {
+            status: 200,
+            headers: { "Content-Type": "application/json" },
+        });
     }
 
     // テスト会話データ作成用のAPI
@@ -205,7 +276,7 @@ Deno.serve(async (req: Request) => {
         }
         const threadId: string = threadData.value.uuid;
         const title: string = threadData.value.title;
-        const postDataList: Deno.KvListIterator<PostModel> = await kv.list({ prefix: [threadId] });
+        const postDataList: Deno.KvListIterator<PostModel> = kv.list({ prefix: [threadId] });
 
         let postList: string = "";
 
