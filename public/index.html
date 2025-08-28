@@ -32,44 +32,21 @@
         // 掲示板一覧を表示するエリア
         const bbsContainer = document.getElementById("bbs-list");
 
-        let bbsList = [];
-
-        // ページ読み込み時に掲示板一覧を取得して表示
-        window.onload = async () => {
-            try {
-                const response = await fetch("/thread-titles");
-                const responseToJson = await response.json();
-                console.log("responseToJson: ", responseToJson);
-
-                renderBbs(responseToJson);
-                renderNewspaper(responseToJson.newspapers);
-            } catch (e) {
-                console.log("error: ", e);
-            }
-        };
-
         function renderBbs(responseToJson) {
             bbsContainer.innerHTML = "";
 
-            const threadList = responseToJson.threads.map((thread) => ({
-                id: thread.uuid,
-                name: thread.title,
-            }));
-
             // 配列の内容を順に表示
-            if (threadList) {
-                bbsList = threadList;
-            }
-            bbsList.forEach((p, index) => {
+            const newspaperId = responseToJson.newspaperUuid;
+            responseToJson.threads.forEach((thread, index) => {
                 const li = document.createElement("li"); // <li></li>を作成
                 li.className = "bbs"; // CSS用クラスを付与
                 const a = document.createElement("a"); // <a></a>を作成
-                a.href = `thread` +
-                    `?newspaper-id=${responseToJson.newspaperUuid}` +
-                    `&index=${index}` +
-                    `&thread-id=${p.id}`;
-                // `&title=${p.name}`; // <a href="thread.html?id=1?title=掲示板1"></a>
-                a.textContent = p.name; // <a>掲示板1</a>
+                a.href = `thread.html` +
+                    `?newspaper-id=${newspaperId}` +
+                    `&index=${index + 1}` +
+                    `&thread-id=${thread.id}` +
+                    `&title=${thread.title}`; // <a href="thread.html?id=1?title=掲示板1"></a>
+                a.textContent = thread.title; // <a>掲示板1</a>
                 li.appendChild(a); // <li><a>掲示板1</a></li>
                 bbsContainer.appendChild(li); // 親要素に追加
             });
@@ -79,7 +56,6 @@
         const newspaperContainer = document.getElementById("newspaper-list");
 
         function renderNewspaper(responseToJson) {
-            let newspaperList = ["newspaper"];
             newspaperContainer.innerHTML = "";
 
             // const newsList = responseToJson.map((news) => ({
@@ -88,16 +64,38 @@
             // if (newsList) {
             //     newspaperList = newsList;
             // }
-            newspaperList.forEach((p) => {
+            responseToJson.forEach((createdAt) => {
                 const li = document.createElement("li");
                 li.className = "newspaper";
                 const a = document.createElement("a");
                 a.href = "http://localhost:8000/newspaper.html";
 
-                a.textContent = p;
+                a.textContent = createdAt;
                 li.appendChild(a);
                 newspaperContainer.appendChild(li);
             });
         }
+
+        // ページ読み込み時に掲示板一覧を取得して表示
+        window.onload = async () => {
+            try {
+                const response = await fetch("/thread-titles");
+                const responseToJson = await response.json();
+                console.log("responseToJson: ", responseToJson);
+
+                renderBbs(responseToJson);
+            } catch (e) {
+                console.log("error: ", e);
+            }
+            try {
+                const response = await fetch("/newspaper-list");
+                const responseToJson = await response.json();
+                console.log("responseToJson: ", responseToJson);
+
+                renderNewspaper(responseToJson);
+            } catch (e) {
+                console.log("error: ", e);
+            }
+        };
     </script>
 </html>
