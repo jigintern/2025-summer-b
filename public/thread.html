@@ -117,12 +117,11 @@
             window.onload = async () => {
                 // いったん中身をクリア
                 titleElement.innerHTML = "";
+                const span = document.createElement("span"); // タイトルのspanを作成
+                span.innerHTML = title;
+                titleElement.appendChild(span); // 親要素に追加
 
                 try {
-                    const span = document.createElement("span"); // タイトルのspanを作成
-                    span.innerHTML = title;
-                    titleElement.appendChild(span); // 親要素に追加
-
                     const endpoint = `/thread-posts` +
                         `?thread-id=${threadId}`;
                     const response = await fetch(endpoint);
