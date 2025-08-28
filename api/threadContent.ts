@@ -130,16 +130,19 @@ const registerThreadPosts = async (ctx: Context) => {
 
 const createThreadPosts = async (ctx: Context) => {
     const newspaperId: string | undefined = ctx.req.query("newspaper-id");
-    const index: string | undefined = ctx.req.query("index");
+    const indexStr: string |undefined = ctx.req.query("index");
+    const index: number = Number(indexStr);
 
     if (!newspaperId || !index) {
         return ctx.text("Missing newspaper-id or index parameter", 400);
     }
 
+    
+
     const kv: Deno.Kv = await Deno.openKv();
     const threadData: Deno.KvEntryMaybe<ThreadModel> = await kv.get([
         newspaperId,
-        Number(index),
+        index,
     ]);
 
     if (!threadData.value) {
