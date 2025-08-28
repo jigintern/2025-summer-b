@@ -16,7 +16,11 @@ const checkAndChangeNewspaperStatus = async (newspaperId: string, kv: Deno.Kv) =
         console.log("newspaperData is not found");
         return;
     }
-    await kv.set(["newspaper", newspaperId], { ...newspaperData.value, enable: true });
+    await kv.set(["newspaper", newspaperId], {
+        ...newspaperData.value,
+        enable: true,
+        createdAt: new Date().toISOString(),
+    });
     return true;
 };
 
