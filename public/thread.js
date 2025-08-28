@@ -43,7 +43,9 @@ ws.onmessage = (event) => {
     // サーバーからの初期データを受信した場合
     if (data.type === "start") {
         const title = data.thread.title;
-        titleElement.textContent = title ? title : "掲示板";
+        const span = document.createElement("span"); // タイトルのspanを作成
+        span.innerHTML = title ? title : "掲示板";
+        titleElement.appendChild(span); // 親要素に追加
         // threadId = data.thread.uuid;
         renderInitialPosts(data.posts);
         if (!data.thread.enable) {
@@ -93,31 +95,43 @@ function renderInitialPosts(posts) {
 
 // ひとつの投稿をリストの末尾に追加する関数
 function appendPost(post) {
-    const postDiv = document.createElement("div");
-    postDiv.className = "post";
+    // 投稿全体のdivを作成
+    const div = document.createElement("div");
+    div.className = "post";
 
-    const mainContentDiv = document.createElement("div");
+    // 投稿者情報と本文をまとめるラッパーdiv
+    const innerWrapper = document.createElement("div");
 
-    const userDiv = document.createElement("div");
-    userDiv.className = "user";
-    userDiv.textContent = post.userName;
+    // 1行目：投稿者情報のdivを作成
+    const headerDiv = document.createElement("div");
 
+    // ユーザー名のspanを作成
+    const userSpan = document.createElement("span");
+    userSpan.className = "user";
+    userSpan.textContent = post.userName; // ★ 安全にユーザー名を設定
+
+    // 日付のspanを作成
+    const dateSpan = document.createElement("span");
+    dateSpan.className = "date";
+    dateSpan.textContent = `:${post.createdAt}`; // ★ 安全に日付を設定
+
+    // headerDivに「番号:」「ユーザー名」「日付」の順で追加
+    headerDiv.append(`${index + 1}:`); // appendはテキストと要素を混在して追加できる
+    headerDiv.appendChild(userSpan);
+    headerDiv.appendChild(dateSpan);
+
+    // 2行目：投稿内容のdivを作成
     const contentDiv = document.createElement("div");
     contentDiv.className = "content";
-    contentDiv.textContent = post.post;
+    contentDiv.textContent = post.post; // ★ 安全に投稿内容を設定
 
-    mainContentDiv.appendChild(userDiv);
-    mainContentDiv.appendChild(contentDiv);
+    // innerWrapperにheaderDivとcontentDivを追加
+    innerWrapper.appendChild(headerDiv);
+    innerWrapper.appendChild(contentDiv);
 
-    const dateDiv = document.createElement("div");
-    dateDiv.className = "date";
-    dateDiv.textContent = post.createdAt;
-
-    postDiv.appendChild(mainContentDiv);
-    postDiv.appendChild(dateDiv);
-
-    postsContainer.appendChild(postDiv);
-    postsContainer.scrollTop = postsContainer.scrollHeight;
+    // 最後に、完成したinnerWrapperをpostクラスを持つdivに追加
+    div.appendChild(innerWrapper);
+    postsContainer.appendChild(div);
 }
 
 const sendFnc = () => {

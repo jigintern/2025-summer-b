@@ -117,7 +117,7 @@ const registerThreadPosts = async (ctx: Context) => {
         if (!threadData.value) {
             throw ctx.json({ "text": "thread data is not found.", "enoughPosts": false });
         }
-        const newThreadData = { ...threadData.value, "enable": false };
+        const newThreadData: ThreadModel = { ...threadData.value, "enable": false };
         await kv.set([newspaperId, threadIndex], newThreadData);
         enoughPosts = true;
     }
@@ -130,23 +130,23 @@ const registerThreadPosts = async (ctx: Context) => {
 
 const createThreadPosts = async (ctx: Context) => {
     const newspaperId: string | undefined = ctx.req.query("newspaper-id");
-    const index: string | undefined = ctx.req.query("index");
-
-    if (!newspaperId || !index) {
+    const indexStr: string | undefined = ctx.req.query("index");
+    if (!newspaperId || !indexStr) {
         return ctx.text("Missing newspaper-id or index parameter", 400);
     }
+    const index: number = Number(indexStr);
 
     const kv: Deno.Kv = await Deno.openKv();
     const threadData: Deno.KvEntryMaybe<ThreadModel> = await kv.get([
         newspaperId,
-        Number(index),
+        index,
     ]);
 
     if (!threadData.value) {
         return ctx.text("thread data is not found.", 404);
     }
 
-    const newThreadData = { ...threadData.value, "title": "オイルショック" };
+    const newThreadData: ThreadModel = { ...threadData.value, "title": "オイルショック" };
     await kv.set([newspaperId, index], newThreadData);
 
     const posts: PostModel[] = convertSamplePostsToPostModels(samplePosts as FormatDatePostModel[]);
@@ -196,7 +196,7 @@ const checkIsReachedTheLimit = async (
         if (!threadData.value) {
             return null;
         }
-        const newThreadData = { ...threadData.value, enable: false };
+        const newThreadData: ThreadModel = { ...threadData.value, enable: false };
         await kv.set([newspaperId, threadIndex], newThreadData);
         return postListLength + 1 === limit_post_number ? false : true;
     } else {

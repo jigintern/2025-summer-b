@@ -121,6 +121,9 @@ const createThreadSummary = async (ctx: Context) => {
     const requestJson = await ctx.req.json();
     const newspaperId: string = requestJson.uuid;
     const indexStr: string = requestJson.index;
+    if (!newspaperId || !indexStr) {
+        return ctx.text("Missing newspaper-id or index parameter", 400);
+    }
     const index: number = Number(indexStr);
 
     const kv: Deno.Kv = await Deno.openKv();
