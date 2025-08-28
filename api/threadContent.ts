@@ -168,26 +168,57 @@ const getWebSocketThreadPosts = async (threadId: string) => {
     return threadPosts;
 };
 
+/**
+@param LIMIT_POST_NUMBER - 1スレッドの投稿上限を指定する定数
+*/
+const LIMIT_POST_NUMBER: number = 20;
+
+/**
+ * @description スレッドの投稿件数が上限かどうかを判定し、上限ならスレッドをクローズする関数
+ * @param newspaperId - 新聞データが持っているUUID
+ * @param threadIndex - 新聞データ内のスレッド番号
+ * @param postListLength - 投稿の数
+ * @param limit_post_number - 投稿の上限数
+ * @returns {bool} - 投稿数が上限に達しているかどうか（上限に達しているならtrue）
+ */
+const checkIsReachedTheLimit = async (
+    newspaperId: string,
+    threadIndex: number,
+    postListLength: number,
+    limit_post_number: number,
+) => {
+    if (postListLength < limit_post_number) {
+        const kv: Deno.Kv = await Deno.openKv();
+        const threadData: Deno.KvEntryMaybe<ThreadModel> = await kv.get([
+            newspaperId,
+            threadIndex,
+        ]);
+        if (!threadData.value) {
+            return null;
+        }
+        const newThreadData = { ...threadData.value, enable: false };
+        await kv.set([newspaperId, threadIndex], newThreadData);
+        return false;
+    } else {
+        return true;
+    }
+};
+
 const postAndGetUserPost = async (
+    threadId: string,
+    newspaperId: string,
+    threadIndex: number,
     postData: RegisterPostModel,
     ws: WebSocket,
     sockets: Set<WebSocket>,
 ) => {
-    const threadId: string | null = postData.threadId;
     const userName: string = postData.userName ?? "名無し";
     const postContent: string | null = postData.post;
 
-    if (!threadId) {
-        ws.send(JSON.stringify({
-            type: "error",
-            message: "Missing thread-id parameter",
-        }));
-        return;
-    }
     if (!postContent) {
         ws.send(JSON.stringify({
             type: "error",
-            message: "Missing post-content parameter",
+            message: "投稿内容が見つかりませんでした。",
         }));
         return;
     }
@@ -196,6 +227,22 @@ const postAndGetUserPost = async (
 
     const threadPostList: FormatDatePostModel[] = await getWebSocketThreadPosts(threadId);
     const postsLength: number = threadPostList.length;
+
+    const isLimit: boolean | null = await checkIsReachedTheLimit(
+        newspaperId,
+        threadIndex,
+        postsLength,
+        LIMIT_POST_NUMBER,
+    );
+    if (isLimit === null) {
+        ws.send(JSON.stringify({ type: "error", message: "スレッドが見つかりませんでした。" }));
+        return;
+    } else if (isLimit) {
+        ws.send(
+            JSON.stringify({ type: "full", message: "スレッド内の投稿数が上限に達しています。" }),
+        );
+        return;
+    }
 
     const createdAt: Date = new Date();
 
@@ -209,7 +256,7 @@ const postAndGetUserPost = async (
     for (const socket of sockets) {
         socket.send(
             JSON.stringify({
-                type: "new_post",
+                type: postsLength + 1 === LIMIT_POST_NUMBER ? "max_new_post" : "new_post",
                 index: postsLength,
                 post: convertToSamplePost(post),
             }),

@@ -44,8 +44,8 @@
                 a.href = `thread.html` +
                     `?newspaper-id=${responseToJson.newspaperUuid}` +
                     `&index=${index}` +
-                    `&thread-id=${p.id}` +
-                    `&title=${p.name}`; // <a href="thread.html?id=1?title=掲示板1"></a>
+                    `&thread-id=${p.id}`;
+                //`&title=${p.name}`; // <a href="thread.html?id=1?title=掲示板1"></a>
                 a.textContent = p.name; // <a>掲示板1</a>
                 li.appendChild(a); // <li><a>掲示板1</a></li>
                 bbsContainer.appendChild(li); // 親要素に追加

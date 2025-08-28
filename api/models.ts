@@ -1,14 +1,14 @@
 type NewspaperModel = {
-    "uuid": string;
-    "enable": boolean;
-    "createdAt": Date | null;
+    uuid: string;
+    enable: boolean;
+    createdAt: Date | null;
 };
 
 type ThreadModel = {
-    "uuid": string;
-    "title": string;
-    "summary": string | null;
-    "enable": boolean;
+    uuid: string;
+    title: string;
+    enable: boolean;
+    summary: string | null;
 };
 
 type PostModel = {

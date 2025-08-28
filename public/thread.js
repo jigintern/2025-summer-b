@@ -1,8 +1,11 @@
 // --- 1. URLからパラメータを取得 ---
 const queryString = globalThis.location.search;
 const params = new URLSearchParams(queryString);
-const title = params.get("title");
+const newspaperId = params.get("newspaper-id");
+const index = params.get("index");
+// const title = params.get("title");
 const threadId = params.get("thread-id");
+// let threadId;
 
 // --- 2. HTML要素を取得 ---
 const titleElement = document.getElementById("title");
@@ -11,13 +14,20 @@ const userNameInput = document.getElementById("userName");
 const postContentInput = document.getElementById("postContent");
 const submitBtn = document.getElementById("submitBtn");
 
-// --- 3. ページタイトルを設定 ---
-titleElement.textContent = title ? title : "掲示板";
+// --- 3. スレッドを閉じる関数 ---
+const closeThread = () => {
+    userNameInput.disabled = true;
+    postContentInput.disabled = true;
+    submitBtn.disabled = true;
+    const closeDiv = document.createElement("div");
+    closeDiv.textContent = "(Close済み)";
+    titleElement.appendChild(closeDiv);
+};
 
 // --- 4. WebSocket接続を確立 ---
 const wsProtocol = location.protocol === "https:" ? "wss" : "ws";
 const ws = new WebSocket(
-    `${wsProtocol}://${location.host}/ws?thread-id=${threadId}`,
+    `${wsProtocol}://${location.host}/ws?newspaper-id=${newspaperId}&index=${index}&thread-id=${threadId}`,
 );
 
 // --- 5. WebSocketのイベントハンドラを設定 ---
@@ -32,7 +42,13 @@ ws.onmessage = (event) => {
 
     // サーバーからの初期データを受信した場合
     if (data.type === "start") {
+        const title = data.thread.title;
+        titleElement.textContent = title ? title : "掲示板";
+        // threadId = data.thread.uuid;
         renderInitialPosts(data.posts);
+        if (!data.thread.enable) {
+            closeThread();
+        }
     } // 新しい投稿がブロードキャストされてきた場合 (サーバー側の実装に依存)
     else if (data.type === "new_post") {
         if (data.index === 0) {
@@ -40,6 +56,13 @@ ws.onmessage = (event) => {
         } else {
             appendPost(data.post);
         }
+    } else if (data.type === "max_new_post") {
+        appendPost(data.post);
+        closeThread();
+        alert("スレッド内投稿数が上限に達しました。");
+    } else if (data.type === "full") {
+        alert(data.message);
+        closeThread();
     } // エラーメッセージを受信した場合
     else if (data.type === "error") {
         alert(data.message);
@@ -49,8 +72,6 @@ ws.onmessage = (event) => {
 // 接続が切れたときの処理
 ws.onclose = () => {
     console.log("WebSocket接続が切れました。");
-    // submitBtn.disabled = true; // 送信ボタンを無効化
-    // submitBtn.textContent = "切断されました";
 };
 
 // エラー発生時の処理
@@ -72,7 +93,6 @@ function renderInitialPosts(posts) {
 
 // ひとつの投稿をリストの末尾に追加する関数
 function appendPost(post) {
-    console.log("post", post);
     const postDiv = document.createElement("div");
     postDiv.className = "post";
 
