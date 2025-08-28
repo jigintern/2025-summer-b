@@ -32,12 +32,12 @@
         // 掲示板一覧を表示するエリア
         const bbsContainer = document.getElementById("bbs-list");
 
-        function renderBbs(responseToJson) {
+        function renderBbs(threadTitles) {
             bbsContainer.innerHTML = "";
 
             // 配列の内容を順に表示
-            const newspaperId = responseToJson.newspaperUuid;
-            responseToJson.threads.forEach((thread, index) => {
+            const newspaperId = threadTitles.newspaperUuid;
+            threadTitles.threads.forEach((thread, index) => {
                 const li = document.createElement("li"); // <li></li>を作成
                 li.className = "bbs"; // CSS用クラスを付与
                 const a = document.createElement("a"); // <a></a>を作成
@@ -55,22 +55,17 @@
         // 新聞一覧を表示するエリア
         const newspaperContainer = document.getElementById("newspaper-list");
 
-        function renderNewspaper(responseToJson) {
+        function renderNewspaper(newspaperList) {
             newspaperContainer.innerHTML = "";
 
-            // const newsList = responseToJson.map((news) => ({
-            // }));
-
-            // if (newsList) {
-            //     newspaperList = newsList;
-            // }
-            responseToJson.forEach((createdAt) => {
+            newspaperList.forEach((newspaper) => {
                 const li = document.createElement("li");
                 li.className = "newspaper";
                 const a = document.createElement("a");
-                a.href = "http://localhost:8000/newspaper.html";
+                a.href =
+                    `http://localhost:8000/newspaper?newspaper-id=${newspaper.uuid}`;
 
-                a.textContent = createdAt;
+                a.textContent = newspaper.createdAt;
                 li.appendChild(a);
                 newspaperContainer.appendChild(li);
             });
@@ -79,20 +74,20 @@
         // ページ読み込み時に掲示板一覧を取得して表示
         window.onload = async () => {
             try {
-                const response = await fetch("/thread-titles");
-                const responseToJson = await response.json();
-                console.log("responseToJson: ", responseToJson);
+                const threadTitlesResponse = await fetch("/thread-titles");
+                const threadTitlesResponseToJson = await threadTitlesResponse.json();
+                console.log("responseToJson: ", threadTitlesResponseToJson);
 
-                renderBbs(responseToJson);
+                renderBbs(threadTitlesResponseToJson);
             } catch (e) {
                 console.log("error: ", e);
             }
             try {
-                const response = await fetch("/newspaper-list");
-                const responseToJson = await response.json();
-                console.log("responseToJson: ", responseToJson);
+                const newspaperListResponse = await fetch("/newspaper-list");
+                const newspaperListResponseToJson = await newspaperListResponse.json();
+                console.log("responseToJson: ", newspaperContainer);
 
-                renderNewspaper(responseToJson);
+                renderNewspaper(newspaperListResponseToJson);
             } catch (e) {
                 console.log("error: ", e);
             }

@@ -129,6 +129,7 @@
                     `?newspaper-id=${newspaperId}`;
                 const response = await fetch(endpoint);
                 const responseToJson = await response.json();
+                console.log(responseToJson);
                 renderContents(responseToJson);
             } catch (e) {
                 console.log("error: ", e);

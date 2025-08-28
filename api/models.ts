@@ -4,6 +4,12 @@ type NewspaperModel = {
     createdAt: Date | null;
 };
 
+type DateStringNewspaperModel = {
+    uuid: string;
+    enable: boolean;
+    createdAt: string;
+};
+
 type ThreadModel = {
     uuid: string;
     title: string;
@@ -36,6 +42,7 @@ type ThreadData = {
 };
 
 export type {
+    DateStringNewspaperModel,
     FormatDatePostModel,
     NewspaperModel,
     PostModel,
