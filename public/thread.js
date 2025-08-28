@@ -29,14 +29,17 @@ ws.onopen = () => {
 // メッセージ受信時の処理
 ws.onmessage = (event) => {
     const data = JSON.parse(event.data);
-    console.log("サーバーから受信:", data); // デバッグ用にコンソールに出力
 
     // サーバーからの初期データを受信した場合
     if (data.type === "start") {
         renderInitialPosts(data.posts);
     } // 新しい投稿がブロードキャストされてきた場合 (サーバー側の実装に依存)
     else if (data.type === "new_post") {
-        appendPost(data.post);
+        if (data.index === 0) {
+            renderInitialPosts([data.post]);
+        } else {
+            appendPost(data.post);
+        }
     } // エラーメッセージを受信した場合
     else if (data.type === "error") {
         alert(data.message);
@@ -64,7 +67,6 @@ function renderInitialPosts(posts) {
         postsContainer.innerHTML = "<p>まだ投稿はありません。</p>";
         return;
     }
-    console.log(posts);
     posts.forEach(appendPost);
 }
 

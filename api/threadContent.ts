@@ -207,7 +207,7 @@ const postAndGetUserPost = async (
     await kv.set([threadId, postsLength], post);
 
     for (const socket of sockets) {
-        socket.send(JSON.stringify({ type: "new_post", post: post }));
+        socket.send(JSON.stringify({ type: "new_post", index: postsLength, post: post }));
     }
 };
 
