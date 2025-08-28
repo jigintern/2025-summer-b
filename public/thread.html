@@ -100,73 +100,79 @@
 
             // --- 送信ボタンが押されたときの処理 ---
             const submitButton = document.getElementById("submitBtn");
-            submitButton.addEventListener(
-                "click",
-                async () => {
-                    // 入力値を取得
-                    const getUserName = document.getElementById("userName").value
-                        .trim();
-                    const postContent = document.getElementById("postContent").value
-                        .trim();
+            const postElement = document.getElementById("postContent");
 
-                    // 名前入力が空なら名前を"名無し"にする
-                    const userName = (getUserName !== "") ? getUserName : "名無し";
+            const sendFnc = async () => {
+                console.log("check");
+                // 入力値を取得
+                const getUserName = document.getElementById("userName").value
+                    .trim();
+                const postContent = postElement.value
+                    .trim();
 
-                    // 入力が空ならアラートを表示して処理を中断
-                    if (!postContent) {
-                        alert("投稿内容を入力してください");
-                        return;
-                    }
+                // 名前入力が空なら名前を"名無し"にする
+                const userName = (getUserName !== "") ? getUserName : "名無し";
 
-                    let enoughPosts = false;
-                    // 新しい投稿を配列に追加
-                    try {
-                        const endpoint = `/new-posts` +
-                            `?newspaper-id=${newspaperId}` +
-                            `&index=${threadIndex}` +
-                            `&thread-id=${threadId}` +
-                            `&user-name=${userName}` +
-                            `&post-content=${postContent}`;
-                        const response = await fetch(endpoint);
-                        const responseToJson = await response.json();
-                        enoughPosts = responseToJson.enoughPosts;
-                    } catch (e) {
-                        console.log("error: ", e);
-                    }
-                    //posts.push({ userName, post: postContent, createdAt });
+                // 入力が空ならアラートを表示して処理を中断
+                if (!postContent) {
+                    alert("投稿内容を入力してください");
+                    return;
+                }
 
-                    if (enoughPosts) {
-                        const request = new Request("/thread-summary", {
-                            method: "POST",
-                            body: JSON.stringify({
-                                "uuid": newspaperId,
-                                "title": title,
-                                "index": threadIndex,
-                            }),
-                        });
-                        const response = await fetch(request);
-                        if (response.status === 200) {
-                            const responseToJson = await response.json();
-                            alert(responseToJson.summary);
-                        }
-                    }
-
-                    // 再描画して新しい投稿を反映
-                    const endpoint = `/thread-posts` +
-                        `?thread-id=${threadId}`;
+                let enoughPosts = false;
+                // 新しい投稿を配列に追加
+                try {
+                    const endpoint = `/new-posts` +
+                        `?newspaper-id=${newspaperId}` +
+                        `&index=${threadIndex}` +
+                        `&thread-id=${threadId}` +
+                        `&user-name=${userName}` +
+                        `&post-content=${postContent}`;
                     const response = await fetch(endpoint);
                     const responseToJson = await response.json();
-                    renderPosts(responseToJson);
+                    enoughPosts = responseToJson.enoughPosts;
+                } catch (e) {
+                    console.log("error: ", e);
+                }
+                //posts.push({ userName, post: postContent, createdAt });
 
-                    // 入力欄をリセット
-                    document.getElementById("postContent").value = "";
-                    document.getElementById("postContent").focus();
-                    submitButton.scrollIntoView({
-                        behavior: "smooth",
-                        block: "start",
+                if (enoughPosts) {
+                    const request = new Request("/thread-summary", {
+                        method: "POST",
+                        body: JSON.stringify({
+                            "uuid": newspaperId,
+                            "title": title,
+                            "index": threadIndex,
+                        }),
                     });
-                },
-            );
+                    const response = await fetch(request);
+                    if (response.status === 200) {
+                        const responseToJson = await response.json();
+                        alert(responseToJson.summary);
+                    }
+                }
+
+                // 再描画して新しい投稿を反映
+                const endpoint = `/thread-posts` +
+                    `?thread-id=${threadId}`;
+                const response = await fetch(endpoint);
+                const responseToJson = await response.json();
+                renderPosts(responseToJson);
+
+                // 入力欄をリセット
+                postElement.value = "";
+                postElement.focus();
+                submitButton.scrollIntoView({
+                    behavior: "smooth",
+                    block: "start",
+                });
+            };
+
+            submitButton.addEventListener("click", sendFnc);
+
+            postElement.addEventListener("keydown", (e) => {
+                if (e.key === "Enter") sendFnc();
+            });
         </script>
     </body>
 </html>
