@@ -2,6 +2,7 @@ import { Hono } from "https://deno.land/x/hono@v4.3.11/mod.ts";
 import { serveStatic } from "https://deno.land/x/hono@v4.3.11/middleware.ts";
 import { getThreadTitles } from "./api/threadList.ts";
 import { createThreadPosts, getThreadPosts, registerThreadPosts } from "./api/threadContent.ts";
+import { getNewspaperList } from "./api/newspaperList.ts";
 import { createThreadSummary, getThreadSummaryList } from "./api/newspaperContent.ts";
 
 const app = new Hono();
@@ -10,6 +11,11 @@ const app = new Hono();
  * スレッドのタイトル一覧を取得するAPI
  */
 app.get("/thread-titles", getThreadTitles);
+
+/**
+ * 新聞の生成時間一覧を取得するAPI
+ */
+app.get("/newspaper-list", getNewspaperList);
 
 /**
  * スレッドの投稿一覧を取得するAPI

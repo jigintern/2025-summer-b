@@ -1,7 +1,7 @@
 import { NewspaperModel } from "./models.ts";
 import { Context } from "https://deno.land/x/hono@v4.3.11/mod.ts";
 
-const getThreadTitles = async (ctx: Context) => {
+const getNewspaperList = async (ctx: Context) => {
     // Deno KVにアクセス
     const kv: Deno.Kv = await Deno.openKv();
 
@@ -10,11 +10,14 @@ const getThreadTitles = async (ctx: Context) => {
         prefix: ["newspaper"],
     });
 
-    const newspaperList: NewspaperModel[] = [];
+    const newspaperList: Date[] = [];
 
     for await (const newspaper of newspapers) {
         if (newspaper.value.enable) {
-            newspaperList.push(newspaper.value);
+            if (!newspaper.value.createdAt) {
+                throw ctx.json("Newspaper enable is true but createdAt is null.", 400);
+            }
+            newspaperList.push(newspaper.value.createdAt);
         }
     }
 
@@ -24,4 +27,4 @@ const getThreadTitles = async (ctx: Context) => {
     });
 };
 
-export { getThreadTitles };
+export { getNewspaperList };
