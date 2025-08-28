@@ -2,7 +2,7 @@
 const queryString = globalThis.location.search;
 const params = new URLSearchParams(queryString);
 const title = params.get("title");
-const threadId = params.get("id");
+const threadId = params.get("thread-id");
 
 // --- 2. HTML要素を取得 ---
 const titleElement = document.getElementById("title");
