@@ -2,7 +2,7 @@ import { Hono } from "https://deno.land/x/hono@v4.3.11/mod.ts";
 import { serveStatic } from "https://deno.land/x/hono@v4.3.11/middleware.ts";
 import { getThreadTitles } from "./api/threadList.ts";
 import { createThreadPosts, getThreadPosts, registerThreadPosts } from "./api/threadContent.ts";
-import { getNewspaperList } from "./api/newspaperList.ts";
+import { createNewspapersData, getNewspaperList } from "./api/newspaperList.ts";
 import { createThreadSummary, getThreadSummaryList } from "./api/newspaperContent.ts";
 import { websocketPost } from "./api/websocket.ts";
 
@@ -51,6 +51,11 @@ app.post("/thread-summary", createThreadSummary);
 @param newspaper-id - 新聞が持っているUUID
  */
 app.get("/get-summary", getThreadSummaryList);
+
+/**
+@description テスト用の新聞のenableをtrueするAPI
+ */
+app.get("/create-news", createNewspapersData);
 
 /**
 @description WebSocket接続を行い、スレッド内の投稿を反映する

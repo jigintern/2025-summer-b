@@ -117,7 +117,7 @@ const registerThreadPosts = async (ctx: Context) => {
         if (!threadData.value) {
             throw ctx.json({ "text": "thread data is not found.", "enoughPosts": false });
         }
-        const newThreadData = { ...threadData.value, "enable": false };
+        const newThreadData: ThreadModel = { ...threadData.value, "enable": false };
         await kv.set([newspaperId, threadIndex], newThreadData);
         enoughPosts = true;
     }
@@ -146,7 +146,7 @@ const createThreadPosts = async (ctx: Context) => {
         return ctx.text("thread data is not found.", 404);
     }
 
-    const newThreadData = { ...threadData.value, "title": "オイルショック" };
+    const newThreadData: ThreadModel = { ...threadData.value, "title": "オイルショック" };
     await kv.set([newspaperId, index], newThreadData);
 
     const posts: PostModel[] = convertSamplePostsToPostModels(samplePosts as FormatDatePostModel[]);
@@ -196,7 +196,7 @@ const checkIsReachedTheLimit = async (
         if (!threadData.value) {
             return null;
         }
-        const newThreadData = { ...threadData.value, enable: false };
+        const newThreadData: ThreadModel = { ...threadData.value, enable: false };
         await kv.set([newspaperId, threadIndex], newThreadData);
         return true;
     } else {
