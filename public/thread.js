@@ -120,7 +120,7 @@ function appendPost(post) {
     postsContainer.scrollTop = postsContainer.scrollHeight;
 }
 
-submitBtn.addEventListener("click", () => {
+const sendFnc = () => {
     const userName = userNameInput.value.trim() || "名無し";
     const postContent = postContentInput.value.trim();
 
@@ -139,7 +139,20 @@ submitBtn.addEventListener("click", () => {
         ws.send(JSON.stringify(message));
         postContentInput.value = "";
         postContentInput.focus();
+        submitBtn.scrollIntoView({
+            behavior: "smooth",
+            block: "start",
+        });
     } else {
         alert("サーバーに接続されていません。");
+    }
+};
+
+submitBtn.addEventListener("click", sendFnc);
+
+postContentInput.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
+        sendFnc();
     }
 });
