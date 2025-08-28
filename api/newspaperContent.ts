@@ -1,5 +1,5 @@
 import "https://deno.land/std@0.224.0/dotenv/load.ts";
-import { PostModel, ThreadModel } from "./models.ts";
+import { PostModel, ThreadData, ThreadModel } from "./models.ts";
 import { Context } from "https://deno.land/x/hono@v4.3.11/mod.ts";
 
 const createThreadSummary = async (ctx: Context) => {
@@ -13,7 +13,8 @@ const createThreadSummary = async (ctx: Context) => {
 
     const requestJson = await ctx.req.json();
     const newspaperId: string = requestJson.uuid;
-    const index: number = requestJson.index;
+    const indexStr: string = requestJson.index;
+    const index: number = Number(indexStr);
 
     const kv: Deno.Kv = await Deno.openKv();
     const threadData: Deno.KvEntryMaybe<ThreadModel> = await kv.get([newspaperId, index]);
@@ -75,6 +76,7 @@ const createThreadSummary = async (ctx: Context) => {
             "uuid": threadId,
             "title": title,
             "summary": summary,
+            "enable": true,
         };
 
         await kv.set([newspaperId, index], selectedThread);
@@ -85,4 +87,36 @@ const createThreadSummary = async (ctx: Context) => {
     }
 };
 
-export { createThreadSummary };
+const getThreadSummaryList = async (ctx: Context) => {
+    const newspaperId: string | undefined = ctx.req.query("newspaper-id");
+
+    if (!newspaperId) {
+        return ctx.text("Missing newspaper-id parameter", 400);
+    }
+
+    const kv: Deno.Kv = await Deno.openKv();
+    const threads: Deno.KvListIterator<ThreadModel> = kv.list<ThreadModel>({
+        prefix: [
+            newspaperId,
+        ],
+    });
+
+    const titleAndSummaryList: ThreadData[] = [];
+
+    for await (const thread of threads) {
+        if (!thread.value) {
+            return ctx.text("threads not found", 404);
+        }
+        titleAndSummaryList.push({
+            "title": thread.value.title,
+            "summary": thread.value.summary,
+        });
+    }
+
+    return ctx.json(titleAndSummaryList, {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+    });
+};
+
+export { createThreadSummary, getThreadSummaryList };

@@ -8,6 +8,7 @@ type ThreadModel = {
     "uuid": string;
     "title": string;
     "summary": string | null;
+    "enable": boolean;
 };
 
 type PostModel = {
@@ -22,4 +23,9 @@ type FormatDatePostModel = {
     createdAt: string;
 };
 
-export type { FormatDatePostModel, NewspaperModel, PostModel, ThreadModel };
+type ThreadData = {
+    title: string;
+    summary: string | null;
+};
+
+export type { FormatDatePostModel, NewspaperModel, PostModel, ThreadData, ThreadModel };
