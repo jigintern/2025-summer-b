@@ -37,6 +37,7 @@ type RegisterPostModel = {
 };
 
 type ThreadData = {
+    threadId: string;
     title: string;
     summary: string | null;
 };
