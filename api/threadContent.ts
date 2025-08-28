@@ -197,9 +197,9 @@ const postAndGetUserPost = async (
     const threadPostList: FormatDatePostModel[] = await getWebSocketThreadPosts(threadId);
     const postsLength: number = threadPostList.length;
 
-    const createdAt: string = new Date().toISOString();
+    const createdAt: Date = new Date();
 
-    const post: FormatDatePostModel = {
+    const post: PostModel = {
         userName: userName,
         post: postContent,
         createdAt: createdAt,
@@ -207,7 +207,13 @@ const postAndGetUserPost = async (
     await kv.set([threadId, postsLength], post);
 
     for (const socket of sockets) {
-        socket.send(JSON.stringify({ type: "new_post", index: postsLength, post: post }));
+        socket.send(
+            JSON.stringify({
+                type: "new_post",
+                index: postsLength,
+                post: convertToSamplePost(post),
+            }),
+        );
     }
 };
 
