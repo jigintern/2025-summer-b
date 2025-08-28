@@ -101,7 +101,7 @@ const createNewspapersData = async (ctx: Context) => {
     newspaperUUID = UUID.generate();
     await kv.set(["newspaper", newspaperUUID], {
         "uuid": newspaperUUID,
-        "enable": false,
+        "enable": true,
         "createdAt": new Date(new Date().getTime() + count * 60 * 1000),
     });
     count++;
