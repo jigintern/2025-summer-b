@@ -95,43 +95,43 @@ function renderInitialPosts(posts) {
 
 // ひとつの投稿をリストの末尾に追加する関数
 function appendPost(post) {
-// 投稿全体のdivを作成
-const div = document.createElement("div");
-div.className = "post";
+    // 投稿全体のdivを作成
+    const div = document.createElement("div");
+    div.className = "post";
 
-// 投稿者情報と本文をまとめるラッパーdiv
-const innerWrapper = document.createElement("div");
+    // 投稿者情報と本文をまとめるラッパーdiv
+    const innerWrapper = document.createElement("div");
 
-// 1行目：投稿者情報のdivを作成
-const headerDiv = document.createElement("div");
+    // 1行目：投稿者情報のdivを作成
+    const headerDiv = document.createElement("div");
 
-// ユーザー名のspanを作成
-const userSpan = document.createElement("span");
-userSpan.className = "user";
-userSpan.textContent = post.userName; // ★ 安全にユーザー名を設定
+    // ユーザー名のspanを作成
+    const userSpan = document.createElement("span");
+    userSpan.className = "user";
+    userSpan.textContent = post.userName; // ★ 安全にユーザー名を設定
 
-// 日付のspanを作成
-const dateSpan = document.createElement("span");
-dateSpan.className = "date";
-dateSpan.textContent = `:${post.createdAt}`; // ★ 安全に日付を設定
+    // 日付のspanを作成
+    const dateSpan = document.createElement("span");
+    dateSpan.className = "date";
+    dateSpan.textContent = `:${post.createdAt}`; // ★ 安全に日付を設定
 
-// headerDivに「番号:」「ユーザー名」「日付」の順で追加
-headerDiv.append(`${index + 1}:`); // appendはテキストと要素を混在して追加できる
-headerDiv.appendChild(userSpan);
-headerDiv.appendChild(dateSpan);
+    // headerDivに「番号:」「ユーザー名」「日付」の順で追加
+    headerDiv.append(`${index + 1}:`); // appendはテキストと要素を混在して追加できる
+    headerDiv.appendChild(userSpan);
+    headerDiv.appendChild(dateSpan);
 
-// 2行目：投稿内容のdivを作成
-const contentDiv = document.createElement("div");
-contentDiv.className = "content";
-contentDiv.textContent = post.post; // ★ 安全に投稿内容を設定
+    // 2行目：投稿内容のdivを作成
+    const contentDiv = document.createElement("div");
+    contentDiv.className = "content";
+    contentDiv.textContent = post.post; // ★ 安全に投稿内容を設定
 
-// innerWrapperにheaderDivとcontentDivを追加
-innerWrapper.appendChild(headerDiv);
-innerWrapper.appendChild(contentDiv);
+    // innerWrapperにheaderDivとcontentDivを追加
+    innerWrapper.appendChild(headerDiv);
+    innerWrapper.appendChild(contentDiv);
 
-// 最後に、完成したinnerWrapperをpostクラスを持つdivに追加
-div.appendChild(innerWrapper);
-postsContainer.appendChild(div);
+    // 最後に、完成したinnerWrapperをpostクラスを持つdivに追加
+    div.appendChild(innerWrapper);
+    postsContainer.appendChild(div);
 }
 
 const sendFnc = () => {
