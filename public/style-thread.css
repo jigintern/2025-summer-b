@@ -11,12 +11,12 @@ body {
     line-height: 1.6;
 }
 
-h1{
+h1 {
     font-family: "DotGothic16", sans-serif;
     color: red;
 }
 
-h2{
+h2 {
     font-family: "DotGothic16", sans-serif;
 }
 
@@ -26,7 +26,7 @@ h2{
 
 .post {
     font-family: "DotGothic16", sans-serif;
-    
+
     border-bottom: 1px solid #ccc;
     padding: 6px 0;
     margin: 0;

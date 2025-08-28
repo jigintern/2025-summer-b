@@ -99,7 +99,8 @@
             };
 
             // --- 送信ボタンが押されたときの処理 ---
-            document.getElementById("submitBtn").addEventListener(
+            const submitButton = document.getElementById("submitBtn");
+            submitButton.addEventListener(
                 "click",
                 async () => {
                     // 入力値を取得
@@ -160,6 +161,10 @@
                     // 入力欄をリセット
                     document.getElementById("postContent").value = "";
                     document.getElementById("postContent").focus();
+                    submitButton.scrollIntoView({
+                        behavior: "smooth",
+                        block: "start",
+                    });
                 },
             );
         </script>
