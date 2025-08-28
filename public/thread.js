@@ -39,6 +39,7 @@ ws.onopen = () => {
 // メッセージ受信時の処理
 ws.onmessage = (event) => {
     const data = JSON.parse(event.data);
+    console.log(data);
 
     // サーバーからの初期データを受信した場合
     if (data.type === "start") {
@@ -138,6 +139,7 @@ submitBtn.addEventListener("click", () => {
         };
         ws.send(JSON.stringify(message));
         postContentInput.value = "";
+        postContentInput.focus();
     } else {
         alert("サーバーに接続されていません。");
     }

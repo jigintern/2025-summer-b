@@ -1,17 +1,32 @@
 body {
     margin: 0;
     position: relative;
-    background-color: #c9d6d8;
+
+    font-family: "DotGothic16", sans-serif;
+    font-style: normal;
+    background-color: #fff;
 }
 
 h1 {
-    text-align: center;
-    padding: 10px 0;
+    display: flex;
+    justify-content: center;
 
-    font-family: "DotGothic16", sans-serif;
-    font-weight: bold;
-    font-style: normal;
     font-size: 64px;
+    font-weight: bold;
+}
+
+.list-container {
+    padding: 0 20px;
+    display: flex;
+    justify-content: space-around;
+}
+
+.bbs-container,
+.newspaper-container {
+    flex: 1;
+    display: flex;
+    justify-content: flex-start;
+    flex-direction: column;
 }
 
 /* 背景画像用
@@ -35,7 +50,8 @@ body::before {
 /* 背景を最背面に配置、本文より下に表示させる */
 /* } */
 
-ul#bbs-list {
+ul#bbs-list,
+ul#newspaper-list {
     padding: 0;
     margin: 0;
 }
@@ -44,7 +60,15 @@ li.bbs {
     list-style: none;
     margin: 10px 0 10px 20px;
 
-    font-family: "DotGothic16", sans-serif;
     font-weight: 400;
-    font-style: normal;
+    font-size: 24px;
+}
+
+li.newspaper {
+    list-style: none;
+    margin: 10px 0 10px 20px;
+    flex-wrap: wrap;
+
+    font-weight: 400;
+    font-size: 24px;
 }
