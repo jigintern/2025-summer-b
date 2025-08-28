@@ -23,7 +23,6 @@ const getThreadTitles = async (ctx: Context) => {
 
     let enableIsTrue: boolean = true;
     for await (const newspaper of newspapers) {
-        console.log(newspaper);
         if (!newspaper.value.enable) {
             enableIsTrue = false;
             newspaperUUID = newspaper.value.uuid;
