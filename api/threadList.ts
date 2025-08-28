@@ -55,8 +55,8 @@ const getThreadTitles = async (ctx: Context) => {
             threadList.push({
                 "uuid": threadUUID,
                 "title": selectedTitles[i],
-                "summary": null,
                 "enable": true,
+                "summary": null,
             });
             await kv.set([newspaperUUID, i], threadList.at(-1));
         }
