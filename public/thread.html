@@ -2,6 +2,8 @@
 <html lang="ja">
     <head>
         <meta charset="UTF-8">
+        <!-- レスポンシブ対応 -->
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="stylesheet" href="style-thread.css">
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -12,10 +14,16 @@
         <title>掲示板</title>
     </head>
     <body>
-        <a href="/" class="back-to-list">一覧ページへ戻る</a>
-        <h1 id="title"></h1>
-        <!-- 投稿を表示するエリア -->
-        <div id="posts"></div>
+        <div class="header-container">
+            <a href="/" class="back-to-list">一覧ページへ戻る</a>
+            <h1 id="title"></h1>
+        </div>
+
+        <!-- スクロール可能なコンテンツエリア -->
+        <div class="content-container">
+            <!-- 投稿を表示するエリア -->
+            <div id="posts"></div>
+        </div>
 
         <!-- 入力フォーム -->
         <div class="form-container">

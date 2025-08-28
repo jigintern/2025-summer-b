@@ -167,16 +167,20 @@ button:focus {
 
     .form-container h2 {
         margin: 0 0 0.2rem 0;
-        font-size: 12px;
+        font-size: 15px;
         line-height: 1;
     }
 
+    .form-container input {
+        width:30%;
+    }
+    
     .form-container input,
     .form-container textarea {
-        font-size: 9px;
+        font-size: 12px;
         padding: 1px 3px;
         margin-bottom: 2px;
-        height: 16px;
+        height: 20px;
         line-height: 1.1;
     }
 

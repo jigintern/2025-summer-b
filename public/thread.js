@@ -95,31 +95,43 @@ function renderInitialPosts(posts) {
 
 // ひとつの投稿をリストの末尾に追加する関数
 function appendPost(post) {
-    const postDiv = document.createElement("div");
-    postDiv.className = "post";
+// 投稿全体のdivを作成
+const div = document.createElement("div");
+div.className = "post";
 
-    const mainContentDiv = document.createElement("div");
+// 投稿者情報と本文をまとめるラッパーdiv
+const innerWrapper = document.createElement("div");
 
-    const userDiv = document.createElement("div");
-    userDiv.className = "user";
-    userDiv.textContent = post.userName;
+// 1行目：投稿者情報のdivを作成
+const headerDiv = document.createElement("div");
 
-    const contentDiv = document.createElement("div");
-    contentDiv.className = "content";
-    contentDiv.textContent = post.post;
+// ユーザー名のspanを作成
+const userSpan = document.createElement("span");
+userSpan.className = "user";
+userSpan.textContent = post.userName; // ★ 安全にユーザー名を設定
 
-    mainContentDiv.appendChild(userDiv);
-    mainContentDiv.appendChild(contentDiv);
+// 日付のspanを作成
+const dateSpan = document.createElement("span");
+dateSpan.className = "date";
+dateSpan.textContent = `:${post.createdAt}`; // ★ 安全に日付を設定
 
-    const dateDiv = document.createElement("div");
-    dateDiv.className = "date";
-    dateDiv.textContent = post.createdAt;
+// headerDivに「番号:」「ユーザー名」「日付」の順で追加
+headerDiv.append(`${index + 1}:`); // appendはテキストと要素を混在して追加できる
+headerDiv.appendChild(userSpan);
+headerDiv.appendChild(dateSpan);
 
-    postDiv.appendChild(mainContentDiv);
-    postDiv.appendChild(dateDiv);
+// 2行目：投稿内容のdivを作成
+const contentDiv = document.createElement("div");
+contentDiv.className = "content";
+contentDiv.textContent = post.post; // ★ 安全に投稿内容を設定
 
-    postsContainer.appendChild(postDiv);
-    postsContainer.scrollTop = postsContainer.scrollHeight;
+// innerWrapperにheaderDivとcontentDivを追加
+innerWrapper.appendChild(headerDiv);
+innerWrapper.appendChild(contentDiv);
+
+// 最後に、完成したinnerWrapperをpostクラスを持つdivに追加
+div.appendChild(innerWrapper);
+postsContainer.appendChild(div);
 }
 
 const sendFnc = () => {
