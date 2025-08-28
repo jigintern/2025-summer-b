@@ -2,10 +2,15 @@ import { Hono } from "https://deno.land/x/hono@v4.3.11/mod.ts";
 import { logger, serveStatic } from "https://deno.land/x/hono@v4.3.11/middleware.ts";
 import { getThreadTitles } from "./api/threadList.ts";
 import { createThreadPosts, getThreadPosts, registerThreadPosts } from "./api/threadContent.ts";
-import { createThreadSummary, getThreadSummaryList } from "./api/newspaperContent.ts";
+import {
+    createThreadSummary,
+    generateSummary,
+    getThreadSummaryList,
+} from "./api/newspaperContent.ts";
 import { websocketPost } from "./api/websocket.ts";
 
 const app = new Hono();
+const kv: Deno.Kv = await Deno.openKv();
 
 app.use(logger());
 
@@ -55,6 +60,35 @@ app.get("/get-summary", getThreadSummaryList);
 @param thread-id - スレッドが持っているUUID
  */
 app.get("/ws", websocketPost);
+
+/**
+@description Deno KVのqueueでセットされたタスクを実行する
+ */
+kv.listenQueue(async (message) => {
+    if (
+        typeof message === "object" && message !== null && "type" in message &&
+        message.type === "summarize" && "payload" in message &&
+        typeof message.payload === "object" && message.payload !== null &&
+        "newspaperId" in message.payload && typeof message.payload.newspaperId === "string" &&
+        "index" in message.payload && typeof message.payload.index === "number"
+    ) {
+        const { newspaperId, index } = message.payload;
+        console.log(`要約タスクを受信: newspaperId=${newspaperId}, index=${index}`);
+        try {
+            await generateSummary(newspaperId, index);
+            console.log(`要約タスクが正常に完了: newspaperId=${newspaperId}, index=${index}`);
+        } catch (error) {
+            console.error(
+                `要約タスクの処理中にエラーが発生しました: newspaperId=${newspaperId}, index=${index}`,
+                error,
+            );
+            // エラーを再スローしてDeno KVにリトライさせる
+            throw error;
+        }
+    } else {
+        console.warn("未対応または不正な形式のメッセージを受信しました:", message);
+    }
+});
 
 // 静的ファイル配信
 app.get(

@@ -198,7 +198,7 @@ const checkIsReachedTheLimit = async (
         }
         const newThreadData = { ...threadData.value, enable: false };
         await kv.set([newspaperId, threadIndex], newThreadData);
-        return postListLength === limit_post_number ? false : true;
+        return postListLength + 1 === limit_post_number ? false : true;
     } else {
         return false;
     }
@@ -252,6 +252,16 @@ const postAndGetUserPost = async (
         createdAt: createdAt,
     };
     await kv.set([threadId, postsLength], post);
+
+    if (postsLength + 1 >= LIMIT_POST_NUMBER) {
+        await kv.enqueue({
+            type: "summarize",
+            payload: { newspaperId: newspaperId, index: threadIndex },
+        });
+        console.log(
+            `要約タスクをキューに追加しました: newspaperId=${newspaperId}, index=${threadIndex}`,
+        );
+    }
 
     for (const socket of sockets) {
         socket.send(
