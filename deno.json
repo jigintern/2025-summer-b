@@ -1,7 +1,6 @@
 {
   "tasks": {
-    "start": "deno run -A --watch --unstable-kv server.deno.ts",
-    "test-start": "deno run -A --watch --unstable-kv test.server.deno.ts"
+    "start": "deno run -A --watch --unstable-kv server.deno.ts"
   },
   "lint": {
     "include": [
