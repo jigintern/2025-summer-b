@@ -2,7 +2,7 @@ body {
     font-family: "DotGothic16", sans-serif;
     font-weight: 400;
     font-style: normal;
-    background-color: #fff;
+    background-color: #f5f5f5;
     color: #000;
 
     margin: 0;
@@ -11,7 +11,22 @@ body {
     line-height: 1.6;
 }
 
+h1{
+    font-family: "DotGothic16", sans-serif;
+    color: red;
+}
+
+h2{
+    font-family: "DotGothic16", sans-serif;
+}
+
+.back-to-ist {
+    font-family: "DotGothic16", sans-serif;
+}
+
 .post {
+    font-family: "DotGothic16", sans-serif;
+    
     border-bottom: 1px solid #ccc;
     padding: 6px 0;
     margin: 0;
@@ -34,10 +49,11 @@ body {
     align-self: flex-end;
 }
 
-/* 入力フォームをページ下に配置 */
 .form-container {
     margin-top: 30px;
     padding: 10px 0;
+    background-color: #f5f5f5;
+    padding: 1rem;
     border-top: 2px solid #ccc;
 }
 
@@ -62,7 +78,7 @@ body {
 } */
 
 /* 昔のHTML風ボタンスタイル */
-button {
+.form-container .button {
     background-color: #c0c0c0;
     border: 2px outset #c0c0c0;
     color: #000000;

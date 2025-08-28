@@ -10,44 +10,9 @@
             rel="stylesheet"
         >
         <title>掲示板</title>
-        <style>
-            body {
-                font-family: sans-serif;
-                padding: 20px;
-            }
-            .post {
-                border: 1px solid #ccc;
-                padding: 10px;
-                margin-bottom: 10px;
-                border-radius: 5px;
-            }
-            .post .user {
-                font-weight: bold;
-            }
-            .post .date {
-                font-size: 0.9em;
-                color: #666;
-            }
-            /* 入力フォームをページ下に配置 */
-            .form-container {
-                margin-top: 30px;
-                padding: 15px;
-                border-top: 2px solid #ccc;
-            }
-            .form-container input, .form-container textarea {
-                width: 100%;
-                padding: 8px;
-                margin-bottom: 10px;
-                box-sizing: border-box;
-            }
-            .form-container button {
-                padding: 8px 16px;
-                cursor: pointer;
-            }
-        </style>
     </head>
     <body>
-        <a href="/">掲示板一覧へ戻る</a>
+        <a href="/" class="back-to-list">一覧ページへ戻る</a>
         <h1 id="title"></h1>
         <!-- 投稿を表示するエリア -->
         <div id="posts"></div>

@@ -10,6 +10,10 @@ body {
     background-color: #f8f8f8;
 }
 
+.back-to-list {
+    font-family: "DotGothic16", sans-serif;
+}
+
 .newspaper {
     display: flex;
     justify-content: center;
