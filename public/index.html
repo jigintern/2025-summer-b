@@ -46,13 +46,13 @@
             if (threadList) {
                 bbsList = threadList;
             }
-            bbsList.forEach((p) => {
+            bbsList.forEach((p, index) => {
                 const li = document.createElement("li"); // <li></li>を作成
                 li.className = "bbs"; // CSS用クラスを付与
                 const a = document.createElement("a"); // <a></a>を作成
                 a.href = `thread.html` +
                     `?newspaper-id=${responseToJson.newspaperUuid}` +
-                    `&index=${index}` +
+                    `&index=${index+1}` +
                     `&thread-id=${p.id}` +
                     `&title=${p.name}`; // <a href="thread.html?id=1?title=掲示板1"></a>
                 a.textContent = p.name; // <a>掲示板1</a>
@@ -66,8 +66,9 @@
             try {
                 const response = await fetch("/thread-titles");
                 const responseToJson = await response.json();
+                console.log("responseToJson: ", responseToJson);
 
-                renderBbs(responseToJson.threads);
+                renderBbs(responseToJson);
                 renderNewspaper(responseToJson.newspapers);
             } catch (e) {
                 console.log("error: ", e);
