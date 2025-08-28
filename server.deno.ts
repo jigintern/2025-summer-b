@@ -1,11 +1,13 @@
 import { Hono } from "https://deno.land/x/hono@v4.3.11/mod.ts";
-import { serveStatic } from "https://deno.land/x/hono@v4.3.11/middleware.ts";
+import { logger, serveStatic } from "https://deno.land/x/hono@v4.3.11/middleware.ts";
 import { getThreadTitles } from "./api/threadList.ts";
 import { createThreadPosts, getThreadPosts, registerThreadPosts } from "./api/threadContent.ts";
 import { createThreadSummary, getThreadSummaryList } from "./api/newspaperContent.ts";
 import { websocketPost } from "./api/websocket.ts";
 
 const app = new Hono();
+
+app.use(logger());
 
 /**
 @description スレッドのタイトル一覧を取得するAPI
