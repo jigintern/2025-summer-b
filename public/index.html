@@ -36,7 +36,7 @@
             bbsContainer.innerHTML = "";
 
             // 配列の内容を順に表示
-            const newspaperId=responseToJson.newspaperUuid;
+            const newspaperId = responseToJson.newspaperUuid;
             responseToJson.threads.forEach((thread, index) => {
                 const li = document.createElement("li"); // <li></li>を作成
                 li.className = "bbs"; // CSS用クラスを付与
