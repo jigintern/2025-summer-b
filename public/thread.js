@@ -56,10 +56,10 @@ ws.onmessage = (event) => {
         if (data.index === 0) {
             renderInitialPosts([data.post]);
         } else {
-            appendPost(data.post);
+            appendPost(data.post, data.index);
         }
     } else if (data.type === "max_new_post") {
-        appendPost(data.post);
+        appendPost(data.post, data.index);
         closeThread();
         alert("スレッド内投稿数が上限に達しました。");
     } else if (data.type === "full") {
@@ -90,11 +90,13 @@ function renderInitialPosts(posts) {
         postsContainer.innerHTML = "<p>まだ投稿はありません。</p>";
         return;
     }
-    posts.forEach(appendPost);
+    posts.forEach((post, index) => {
+        appendPost(post, index);
+    });
 }
 
 // ひとつの投稿をリストの末尾に追加する関数
-function appendPost(post) {
+function appendPost(post, index) {
     // 投稿全体のdivを作成
     const div = document.createElement("div");
     div.className = "post";

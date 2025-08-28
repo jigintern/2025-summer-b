@@ -9,9 +9,9 @@ import {
     getThreadSummaryList,
 } from "./api/newspaperContent.ts";
 import { websocketPost } from "./api/websocket.ts";
+import kv from "./api/lib/kv.ts";
 
 const app = new Hono();
-const kv: Deno.Kv = await Deno.openKv();
 
 app.use(logger());
 

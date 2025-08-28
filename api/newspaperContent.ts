@@ -1,6 +1,7 @@
 import "https://deno.land/std@0.224.0/dotenv/load.ts";
 import { NewspaperModel, PostModel, ThreadData, ThreadModel } from "./models.ts";
 import { Context } from "https://deno.land/x/hono@v4.3.11/mod.ts";
+import kv from "./lib/kv.ts";
 
 const checkAndChangeNewspaperStatus = async (newspaperId: string, kv: Deno.Kv) => {
     const threadList: Deno.KvListIterator<ThreadModel> = kv.list({ prefix: [newspaperId] });
@@ -34,7 +35,6 @@ const generateSummary = async (newspaperId: string, index: number) => {
         return;
     }
 
-    const kv: Deno.Kv = await Deno.openKv();
     const threadData: Deno.KvEntryMaybe<ThreadModel> = await kv.get([newspaperId, index]);
 
     if (!threadData.value) {
@@ -126,7 +126,6 @@ const createThreadSummary = async (ctx: Context) => {
     }
     const index: number = Number(indexStr);
 
-    const kv: Deno.Kv = await Deno.openKv();
     const threadData: Deno.KvEntryMaybe<ThreadModel> = await kv.get([newspaperId, index]);
 
     if (!threadData.value) {
@@ -204,7 +203,6 @@ const getThreadSummaryList = async (ctx: Context) => {
         return ctx.text("Missing newspaper-id parameter", 400);
     }
 
-    const kv: Deno.Kv = await Deno.openKv();
     const threads: Deno.KvListIterator<ThreadModel> = kv.list<ThreadModel>({
         prefix: [
             newspaperId,
