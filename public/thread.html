@@ -2,6 +2,8 @@
 <html lang="ja">
     <head>
         <meta charset="UTF-8">
+        <!-- レスポンシブ対応 -->
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="stylesheet" href="style-thread.css">
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -12,10 +14,16 @@
         <title>掲示板</title>
     </head>
     <body>
-        <a href="/" class="back-to-list">一覧ページへ戻る</a>
-        <h1 id="title"></h1>
-        <!-- 投稿を表示するエリア -->
-        <div id="posts"></div>
+        <div class="header-container">
+            <a href="/" class="back-to-list">一覧ページへ戻る</a>
+            <h1 id="title"></h1>
+        </div>
+
+        <!-- スクロール可能なコンテンツエリア -->
+        <div class="content-container">
+            <!-- 投稿を表示するエリア -->
+            <div id="posts"></div>
+        </div>
 
         <!-- 入力フォーム -->
         <div class="form-container">
@@ -64,16 +72,17 @@
                 if (postList) {
                     posts = postList;
                 }
-                posts.forEach((p) => {
+                posts.forEach((p,index) => {
                     const div = document.createElement("div"); // 投稿全体のdivを作成
                     div.className = "post"; // CSS用クラスを付与
                     div.innerHTML = `
                     <div>    
-                        <div class="user">${p.userName}</div>
+                        <div>${index+1}:<span class="user">${p.userName}</span><span class="date">:${p.createdAt}</span></div>
                         <div class="content">${p.post}</div>
                     </div>
-                    <div class="date">${p.createdAt}</div>
+
                 `;
+                    // <div class="date">${p.createdAt}</div>
                     postsContainer.appendChild(div); // 親要素に追加
                 });
             }
