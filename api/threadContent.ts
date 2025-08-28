@@ -187,7 +187,7 @@ const checkIsReachedTheLimit = async (
     postListLength: number,
     limit_post_number: number,
 ) => {
-    if (postListLength >= limit_post_number) {
+    if (postListLength > limit_post_number + 1) {
         const kv: Deno.Kv = await Deno.openKv();
         const threadData: Deno.KvEntryMaybe<ThreadModel> = await kv.get([
             newspaperId,
@@ -198,9 +198,9 @@ const checkIsReachedTheLimit = async (
         }
         const newThreadData = { ...threadData.value, enable: false };
         await kv.set([newspaperId, threadIndex], newThreadData);
-        return false;
-    } else {
         return true;
+    } else {
+        return false;
     }
 };
 

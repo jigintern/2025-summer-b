@@ -39,7 +39,6 @@ ws.onopen = () => {
 // メッセージ受信時の処理
 ws.onmessage = (event) => {
     const data = JSON.parse(event.data);
-    console.log(data);
 
     // サーバーからの初期データを受信した場合
     if (data.type === "start") {
