@@ -2,7 +2,7 @@
 <html lang="ja">
     <head>
         <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width" , initial-scale="1">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="stylesheet" href="style-bbs.css">
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -34,6 +34,20 @@
 
         let bbsList = [];
 
+        // ページ読み込み時に掲示板一覧を取得して表示
+        window.onload = async () => {
+            try {
+                const response = await fetch("/thread-titles");
+                const responseToJson = await response.json();
+                console.log("responseToJson: ", responseToJson);
+
+                renderBbs(responseToJson);
+                renderNewspaper(responseToJson.newspapers);
+            } catch (e) {
+                console.log("error: ", e);
+            }
+        };
+
         function renderBbs(responseToJson) {
             bbsContainer.innerHTML = "";
 
@@ -60,20 +74,6 @@
                 bbsContainer.appendChild(li); // 親要素に追加
             });
         }
-
-        // ページ読み込み時に掲示板一覧を取得して表示
-        window.onload = async () => {
-            try {
-                const response = await fetch("/thread-titles");
-                const responseToJson = await response.json();
-                console.log("responseToJson: ", responseToJson);
-
-                renderBbs(responseToJson);
-                renderNewspaper(responseToJson.newspapers);
-            } catch (e) {
-                console.log("error: ", e);
-            }
-        };
 
         // 新聞一覧を表示するエリア
         const newspaperContainer = document.getElementById("newspaper-list");
