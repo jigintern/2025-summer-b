@@ -4,7 +4,6 @@
 }
 
 body {
-    font-family: "Times New Roman", serif;
     margin: 0;
     padding: 20px;
     background-color: #f8f8f8;
@@ -74,6 +73,7 @@ body {
     border: 1px solid #bdc3c7;
     background-color: #ecf0f1;
     font-weight: bold;
+    font-family: "OradanoGSRR", sans-serif;
 }
 
 /* 見出し */

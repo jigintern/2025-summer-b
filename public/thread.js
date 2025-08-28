@@ -43,7 +43,9 @@ ws.onmessage = (event) => {
     // サーバーからの初期データを受信した場合
     if (data.type === "start") {
         const title = data.thread.title;
-        titleElement.textContent = title ? title : "掲示板";
+        const span = document.createElement("span"); // タイトルのspanを作成
+        span.innerHTML = title ? title : "掲示板";
+        titleElement.appendChild(span); // 親要素に追加
         // threadId = data.thread.uuid;
         renderInitialPosts(data.posts);
         if (!data.thread.enable) {
