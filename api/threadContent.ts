@@ -1,4 +1,4 @@
-import { FormatDatePostModel, PostModel, ThreadModel } from "./models.ts";
+import { FormatDatePostModel, PostModel, RegisterPostModel, ThreadModel } from "./models.ts";
 import { Context } from "https://deno.land/x/hono@v4.3.11/mod.ts";
 import samplePosts from "./data/samplePosts.json" with { type: "json" };
 
@@ -130,7 +130,7 @@ const registerThreadPosts = async (ctx: Context) => {
 
 const createThreadPosts = async (ctx: Context) => {
     const newspaperId: string | undefined = ctx.req.query("newspaper-id");
-    const indexStr: string |undefined = ctx.req.query("index");
+    const indexStr: string | undefined = ctx.req.query("index");
     if (!newspaperId || !indexStr) {
         return ctx.text("Missing newspaper-id or index parameter", 400);
     }
@@ -157,4 +157,117 @@ const createThreadPosts = async (ctx: Context) => {
     return ctx.text("create successful");
 };
 
-export { createThreadPosts, getThreadPosts, registerThreadPosts };
+const getWebSocketThreadPosts = async (threadId: string) => {
+    const kv: Deno.Kv = await Deno.openKv();
+    const postList: Deno.KvListIterator<PostModel> = await kv.list({ prefix: [threadId] });
+    const threadPosts: FormatDatePostModel[] = [];
+    for await (const post of postList) {
+        threadPosts.push(convertToSamplePost(post.value));
+    }
+
+    return threadPosts;
+};
+
+/**
+@param LIMIT_POST_NUMBER - 1スレッドの投稿上限を指定する定数
+*/
+const LIMIT_POST_NUMBER: number = 20;
+
+/**
+ * @description スレッドの投稿件数が上限かどうかを判定し、上限ならスレッドをクローズする関数
+ * @param newspaperId - 新聞データが持っているUUID
+ * @param threadIndex - 新聞データ内のスレッド番号
+ * @param postListLength - 投稿の数
+ * @param limit_post_number - 投稿の上限数
+ * @returns {bool} - 投稿数が上限に達しているかどうか（上限に達しているならtrue）
+ */
+const checkIsReachedTheLimit = async (
+    newspaperId: string,
+    threadIndex: number,
+    postListLength: number,
+    limit_post_number: number,
+) => {
+    if (postListLength >= limit_post_number + 1) {
+        const kv: Deno.Kv = await Deno.openKv();
+        const threadData: Deno.KvEntryMaybe<ThreadModel> = await kv.get([
+            newspaperId,
+            threadIndex,
+        ]);
+        if (!threadData.value) {
+            return null;
+        }
+        const newThreadData = { ...threadData.value, enable: false };
+        await kv.set([newspaperId, threadIndex], newThreadData);
+        return true;
+    } else {
+        return false;
+    }
+};
+
+const postAndGetUserPost = async (
+    threadId: string,
+    newspaperId: string,
+    threadIndex: number,
+    postData: RegisterPostModel,
+    ws: WebSocket,
+    sockets: Set<WebSocket>,
+) => {
+    const userName: string = postData.userName ?? "名無し";
+    const postContent: string | null = postData.post;
+
+    if (!postContent) {
+        ws.send(JSON.stringify({
+            type: "error",
+            message: "投稿内容が見つかりませんでした。",
+        }));
+        return;
+    }
+
+    const kv: Deno.Kv = await Deno.openKv();
+
+    const threadPostList: FormatDatePostModel[] = await getWebSocketThreadPosts(threadId);
+    const postsLength: number = threadPostList.length;
+
+    const isLimit: boolean | null = await checkIsReachedTheLimit(
+        newspaperId,
+        threadIndex,
+        postsLength,
+        LIMIT_POST_NUMBER,
+    );
+    if (isLimit === null) {
+        ws.send(JSON.stringify({ type: "error", message: "スレッドが見つかりませんでした。" }));
+        return;
+    } else if (isLimit) {
+        ws.send(
+            JSON.stringify({ type: "full", message: "スレッド内の投稿数が上限に達しています。" }),
+        );
+        return;
+    }
+
+    const createdAt: Date = new Date();
+
+    const post: PostModel = {
+        userName: userName,
+        post: postContent,
+        createdAt: createdAt,
+    };
+    await kv.set([threadId, postsLength], post);
+
+    for (const socket of sockets) {
+        socket.send(
+            JSON.stringify({
+                type: postsLength + 1 === LIMIT_POST_NUMBER ? "max_new_post" : "new_post",
+                index: postsLength,
+                post: convertToSamplePost(post),
+            }),
+        );
+    }
+};
+
+export {
+    createThreadPosts,
+    getThreadPosts,
+    getWebSocketThreadPosts,
+    postAndGetUserPost,
+    registerThreadPosts,
+};
