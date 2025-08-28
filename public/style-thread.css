@@ -172,9 +172,9 @@ button:focus {
     }
 
     .form-container input {
-        width:30%;
+        width: 30%;
     }
-    
+
     .form-container input,
     .form-container textarea {
         font-size: 12px;
