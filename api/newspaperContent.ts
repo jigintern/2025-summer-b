@@ -1,5 +1,5 @@
 import "https://deno.land/std@0.224.0/dotenv/load.ts";
-import { PostModel, ThreadData, ThreadModel } from "./models.ts";
+import { NewspaperModel, PostModel, ThreadData, ThreadModel } from "./models.ts";
 import { Context } from "https://deno.land/x/hono@v4.3.11/mod.ts";
 
 const createThreadSummary = async (ctx: Context) => {
@@ -98,11 +98,19 @@ const getThreadSummaryList = async (ctx: Context) => {
     }
 
     const kv: Deno.Kv = await Deno.openKv();
+    const newspaper: Deno.KvEntryMaybe<NewspaperModel> = await kv.get<NewspaperModel>([
+        "newspaper",
+        newspaperId,
+    ]);
     const threads: Deno.KvListIterator<ThreadModel> = kv.list<ThreadModel>({
         prefix: [
             newspaperId,
         ],
     });
+
+    if (!newspaper.value) {
+        return ctx.text("newspaper not found", 404);
+    }
 
     const titleAndSummaryList: ThreadData[] = [];
 
@@ -116,7 +124,7 @@ const getThreadSummaryList = async (ctx: Context) => {
         });
     }
 
-    return ctx.json(titleAndSummaryList, {
+    return ctx.json({ newspaper: newspaper.value, threads: titleAndSummaryList }, {
         status: 200,
         headers: { "Content-Type": "application/json" },
     });
