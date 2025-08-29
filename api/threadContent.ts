@@ -159,7 +159,7 @@ const getWebSocketThreadPosts = async (threadId: string) => {
 /**
 @param LIMIT_POST_NUMBER - 1スレッドの投稿上限を指定する定数
 */
-const LIMIT_POST_NUMBER: number = 5;
+const LIMIT_POST_NUMBER: number = 20;
 
 /**
  * @description スレッドの投稿件数が上限かどうかを判定し、上限ならスレッドをクローズする関数
