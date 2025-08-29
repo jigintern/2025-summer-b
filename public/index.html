@@ -62,8 +62,7 @@
                 const li = document.createElement("li");
                 li.className = "newspaper";
                 const a = document.createElement("a");
-                a.href =
-                    `http://localhost:8000/newspaper?newspaper-id=${newspaper.uuid}`;
+                a.href = `/newspaper?newspaper-id=${newspaper.uuid}`;
 
                 a.textContent = newspaper.createdAt;
                 li.appendChild(a);
