@@ -167,8 +167,21 @@ const sendFnc = () => {
 
 submitBtn.addEventListener("click", sendFnc);
 
+// IME入力中かどうかを判定するフラグ
+let isComposing = false;
+
+// IME入力開始時
+postContentInput.addEventListener("compositionstart", () => {
+    isComposing = true;
+});
+
+// IME入力終了時
+postContentInput.addEventListener("compositionend", () => {
+    isComposing = false;
+});
+
 postContentInput.addEventListener("keydown", (e) => {
-    if (e.key === "Enter" && !e.shiftKey) {
+    if (e.key === "Enter" && !e.shiftKey && !isComposing) {
         e.preventDefault();
         sendFnc();
     }
