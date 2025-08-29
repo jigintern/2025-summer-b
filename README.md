@@ -40,14 +40,14 @@ https://akaishitaku-2025-summer-66.deno.dev
 
 ### local環境
 
-### gemini APIを用いた処理の実行準備
+#### gemini APIを用いた処理の実行準備
 `.env.copy`から`.env`を作成
 ```shell
 cp .env.copy .env
 ```
 [Google AI Studio](https://aistudio.google.com/apikey?hl=ja)からgeminiのAPI KEYを取得し、`.env`内の`GOOGLE_API_KEY`に入れる
 
-### 実行手順
+#### 実行手順
 1. このリポジトリをclone
 ```shell
 git clone https://github.com/jigintern/2025-summer-b.git
