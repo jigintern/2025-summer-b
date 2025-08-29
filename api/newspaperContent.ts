@@ -224,8 +224,9 @@ const getThreadSummaryList = async (ctx: Context) => {
             return ctx.text("threads not found", 404);
         }
         titleAndSummaryList.push({
-            "title": thread.value.title,
-            "summary": thread.value.summary,
+            threadId: thread.value.uuid,
+            title: thread.value.title,
+            summary: thread.value.summary,
         });
     }
 
