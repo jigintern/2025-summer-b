@@ -1,40 +1,64 @@
-# template-deno-dev
+# ちょべりぐ新聞掲示板
 
-[Deno](https://deno.land/)を使った開発のテンプレートです。\
-[Deno Deploy](https://deno.com/deploy)を利用して外部へ公開することを想定しています。
+## 概要
+本アプリは**昔あったニュースをおもしろおかしく改変するエンタメを提供するアプリケーション**です。\
+本アプリは、投稿型掲示板サイトです。本アプリは、事前に過去のニュースからテーマが決められた5つのスレッドがあり、ユーザにはスレッド内でそのニュースがあった当時の人間になり切って投稿をしていただきます。\
+嘘を吐いてもOK！知らないニュースについて想像で語ってもOK！ユーザはこのスレッド内で、与えられたテーマについて自由に投稿を行うことが出来ます。
+スレッドでの会話が多くなると、スレッドがcloseされ、スレッド内の会話を元に新聞が生成されます。\
+あなた達だけのオリジナルのレトロ新聞を、面白おかしく、そして自由に作りましょう！
 
-## Deno Deploy の利用方法
+## 機能概要
 
-↓以上の詳細は公式リファレンスへ。
+### スレッド・新聞一覧
+- 画面左に公開状態のスレッド、画面右に生成済み新聞一覧が表示される
+- 公開されているスレッドが全てcloseされると、新たなスレッドタイトルが5つ生成される
+- スレッドタイトルをクリックすると、スレッド詳細画面へ遷移する
+- 新聞一覧をクリックすると新聞詳細へ遷移する
+![スレッド・新聞一覧](images/thread_newspaper_list.png)
 
-1. [Deno Deploy](https://deno.com/deploy)にアクセスして、右上の「Sign
-   In」からGitHubアカウントでのOAuthログインでアカウントを作成orログインしてください。
-2. 青い「+ New Project」から「Create a project」画面に遷移して、「Deploy an
-   existing GitHub repository」側から GitHub repository の「Select a
-   repository」をクリック
-3. Create a project from GitHub
-   の画面で、デプロイするリポジトリを選んでこのリポジトリをテンプレートにした場合は「No
-   build
-   step」で、メインのDenoのコードが書いてあるファイルをエントリポイントに指定して「Create
-   & Deploy」します。
-4. ダイアログが出て Deployed
-   になれば成功。右上の青い「View」からデプロイされたページが確認できるはずです。
+### スレッド詳細
+- スレッド詳細では、スレッド内での投稿一覧を表示する
+- 投稿は画面下のテキストボックスに入力して、「送信」ボタンを押すことで送信する
+- そのスレッド内で投稿が会った場合、リアルタイムで画面を更新する
+![スレッド詳細画面](images/thread.png)
 
-## コミットテンプレートとemoji prefixについて
+- スレッド内の投稿件数が20件に達すると、そのスレッドはcloseされ、追加の投稿ができなくなる
+![close済スレッド詳細画面](images/close_thread.png)
 
-コミットテンプレートは以下のようにして使用できます。
+## 新聞詳細
+- 5つのスレッドが全てcloseされると、新聞が生成され、新聞一覧の一番上に追加される
+![新聞詳細画面](images/newspaper.png)
 
-```shell
-cd <リポジトリ直下>
-git config commit.template ./.commit_template
-```
+- 新聞の本文をクリックすると、その記事をモーダルで表示する
+![新聞モーダル](images/newspaper_modal.png)
 
-emoji prefix
-にはコミット履歴が可愛くなる他にもメリットがありますが、コミット履歴が可愛くなるのが好きで使ってます。
+- 各記事の見出しをクリックすると、記事の生成元のcloseしたスレッドを閲覧することができる
 
-## gemini APIを用いたendpointの実行方法
+## 実行方法
+### Deno Deploy
+https://akaishitaku-2025-summer-66.deno.dev
+
+### local環境
+
+#### gemini APIを用いた処理の実行準備
 `.env.copy`から`.env`を作成
 ```shell
 cp .env.copy .env
 ```
-geminiのAPI KEYを取得し、`.env`内の`GOOGLE_API_KEY`に入れる
+[Google AI Studio](https://aistudio.google.com/apikey?hl=ja)からgeminiのAPI KEYを取得し、`.env`内の`GOOGLE_API_KEY`に入れる
+
+#### 実行手順
+1. このリポジトリをclone
+```shell
+git clone https://github.com/jigintern/2025-summer-b.git
+```
+
+2. denoで`server.deno.ts`を起動
+```shell
+deno task start
+```
+
+3. local serverへアクセス
+```
+http://localhost:8000
+```
