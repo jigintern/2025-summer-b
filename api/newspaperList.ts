@@ -1,4 +1,4 @@
-import { NewspaperModel } from "./models.ts";
+import { DateStringNewspaperModel, NewspaperModel } from "./models.ts";
 import { UUID } from "npm:uuidjs";
 import { Context } from "https://deno.land/x/hono@v4.3.11/mod.ts";
 import kv from "./lib/kv.ts";
@@ -31,24 +31,30 @@ const getNewspaperList = async (ctx: Context) => {
         prefix: ["newspaper"],
     });
 
-    const newspaperList: string[] = [];
+    const newspaperList: DateStringNewspaperModel[] = [];
 
     for await (const newspaper of newspapers) {
         if (newspaper.value.enable) {
             if (!newspaper.value.createdAt) {
                 throw ctx.json("Newspaper enable is true but createdAt is null.", 400);
             }
-            newspaperList.push(convertToSamplePost(newspaper.value.createdAt));
+            newspaperList.push({
+                ...newspaper.value,
+                createdAt: convertToSamplePost(new Date(newspaper.value.createdAt)),
+            });
         }
     }
 
-    newspaperList.sort();
+    newspaperList.sort((a, b) =>
+        (new Date(b.createdAt).getTime()) - (new Date(a.createdAt).getTime())
+    );
 
     // listをJSONとして返す
     return ctx.json(newspaperList, {
         headers: { "Content-Type": "application/json" },
     });
 };
+
 const createNewspapersData = async (ctx: Context) => {
     let newspaperUUID: string;
     let count: number = 0;

@@ -203,11 +203,19 @@ const getThreadSummaryList = async (ctx: Context) => {
         return ctx.text("Missing newspaper-id parameter", 400);
     }
 
+    const newspaper: Deno.KvEntryMaybe<NewspaperModel> = await kv.get<NewspaperModel>([
+        "newspaper",
+        newspaperId,
+    ]);
     const threads: Deno.KvListIterator<ThreadModel> = kv.list<ThreadModel>({
         prefix: [
             newspaperId,
         ],
     });
+
+    if (!newspaper.value) {
+        return ctx.text("newspaper not found", 404);
+    }
 
     const titleAndSummaryList: ThreadData[] = [];
 
@@ -216,12 +224,13 @@ const getThreadSummaryList = async (ctx: Context) => {
             return ctx.text("threads not found", 404);
         }
         titleAndSummaryList.push({
-            "title": thread.value.title,
-            "summary": thread.value.summary,
+            threadId: thread.value.uuid,
+            title: thread.value.title,
+            summary: thread.value.summary,
         });
     }
 
-    return ctx.json(titleAndSummaryList, {
+    return ctx.json({ newspaper: newspaper.value, threads: titleAndSummaryList }, {
         status: 200,
         headers: { "Content-Type": "application/json" },
     });
