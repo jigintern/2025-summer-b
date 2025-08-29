@@ -136,7 +136,7 @@ button:focus {
     outline-offset: -4px;
 }
 
-button:disabled{
+button:disabled {
     background-color: #e0e0e0;
     border: 2px outset #e0e0e0;
     color: #a0a0a0;

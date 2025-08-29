@@ -1,40 +1,39 @@
-# template-deno-dev
+# ちょべりぐ新聞掲示板
 
-[Deno](https://deno.land/)を使った開発のテンプレートです。\
-[Deno Deploy](https://deno.com/deploy)を利用して外部へ公開することを想定しています。
+## 概要
+本アプリは**昔あったニュースをおもしろおかしく改変するエンタメを提供するアプリケーション**です。\
+本アプリは、投稿型掲示板サイトです。本アプリは、事前に過去のニュースからテーマが決められた5つのスレッドがあり、ユーザにはスレッド内でそのニュースがあった当時の人間になり切って投稿をしていただきます。\
+嘘を吐いてもOK！知らないニュースについて想像で語ってもOK！ユーザはこのスレッド内で、与えられたテーマについて自由に投稿を行うことが出来ます。
+スレッドでの会話が多くなると、スレッドがcloseされ、スレッド内の会話を元に新聞が生成されます。\
+あなた達だけのオリジナルのレトロ新聞を、面白おかしく、そして自由に作りましょう！
 
-## Deno Deploy の利用方法
+## 機能概要
 
-↓以上の詳細は公式リファレンスへ。
+## 実行方法
+### Deno Deploy
+https://akaishitaku-2025-summer-66.deno.dev
 
-1. [Deno Deploy](https://deno.com/deploy)にアクセスして、右上の「Sign
-   In」からGitHubアカウントでのOAuthログインでアカウントを作成orログインしてください。
-2. 青い「+ New Project」から「Create a project」画面に遷移して、「Deploy an
-   existing GitHub repository」側から GitHub repository の「Select a
-   repository」をクリック
-3. Create a project from GitHub
-   の画面で、デプロイするリポジトリを選んでこのリポジトリをテンプレートにした場合は「No
-   build
-   step」で、メインのDenoのコードが書いてあるファイルをエントリポイントに指定して「Create
-   & Deploy」します。
-4. ダイアログが出て Deployed
-   になれば成功。右上の青い「View」からデプロイされたページが確認できるはずです。
+### local環境
 
-## コミットテンプレートとemoji prefixについて
-
-コミットテンプレートは以下のようにして使用できます。
-
-```shell
-cd <リポジトリ直下>
-git config commit.template ./.commit_template
-```
-
-emoji prefix
-にはコミット履歴が可愛くなる他にもメリットがありますが、コミット履歴が可愛くなるのが好きで使ってます。
-
-## gemini APIを用いたendpointの実行方法
+### gemini APIを用いた処理の実行準備
 `.env.copy`から`.env`を作成
 ```shell
 cp .env.copy .env
 ```
-geminiのAPI KEYを取得し、`.env`内の`GOOGLE_API_KEY`に入れる
+[Google AI Studio](https://aistudio.google.com/apikey?hl=ja)からgeminiのAPI KEYを取得し、`.env`内の`GOOGLE_API_KEY`に入れる
+
+### 実行手順
+1. このリポジトリをclone
+```shell
+git clone https://github.com/jigintern/2025-summer-b.git
+```
+
+2. denoで`server.deno.ts`を起動
+```shell
+deno task start
+```
+
+3. local serverへアクセス
+```
+http://localhost:8000
+```
