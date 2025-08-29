@@ -41,11 +41,11 @@
                 const li = document.createElement("li"); // <li></li>を作成
                 li.className = "bbs"; // CSS用クラスを付与
                 const a = document.createElement("a"); // <a></a>を作成
-                a.href = `thread.html` +
+                a.href = `thread` +
                     `?newspaper-id=${newspaperId}` +
-                    `&index=${index + 1}` +
-                    `&thread-id=${thread.id}` +
-                    `&title=${thread.title}`; // <a href="thread.html?id=1?title=掲示板1"></a>
+                    `&index=${index}` +
+                    `&thread-id=${thread.uuid}`;
+                // <a href="thread.html?id=1?title=掲示板1"></a>
                 a.textContent = thread.title; // <a>掲示板1</a>
                 li.appendChild(a); // <li><a>掲示板1</a></li>
                 bbsContainer.appendChild(li); // 親要素に追加

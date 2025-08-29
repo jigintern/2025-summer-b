@@ -1,6 +1,113 @@
 import "https://deno.land/std@0.224.0/dotenv/load.ts";
 import { NewspaperModel, PostModel, ThreadData, ThreadModel } from "./models.ts";
 import { Context } from "https://deno.land/x/hono@v4.3.11/mod.ts";
+import kv from "./lib/kv.ts";
+
+const checkAndChangeNewspaperStatus = async (newspaperId: string, kv: Deno.Kv) => {
+    const threadList: Deno.KvListIterator<ThreadModel> = kv.list({ prefix: [newspaperId] });
+
+    for await (const thread of threadList) {
+        if (thread.value.enable) return false;
+    }
+    const newspaperData: Deno.KvEntryMaybe<NewspaperModel> = await kv.get<NewspaperModel>([
+        "newspaper",
+        newspaperId,
+    ]);
+    if (!newspaperData.value) {
+        console.log("newspaperData is not found");
+        return;
+    }
+    await kv.set(["newspaper", newspaperId], {
+        ...newspaperData.value,
+        enable: true,
+        createdAt: new Date().toISOString(),
+    });
+    return true;
+};
+
+const generateSummary = async (newspaperId: string, index: number) => {
+    const API_KEY: string | undefined = Deno.env.get("GOOGLE_API_KEY");
+    const API_URL: string =
+        "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent";
+
+    if (!API_KEY) {
+        console.log("GOOGLE_API_KEY is not set in environment variables.");
+        return;
+    }
+
+    const threadData: Deno.KvEntryMaybe<ThreadModel> = await kv.get([newspaperId, index]);
+
+    if (!threadData.value) {
+        console.log("thread data is not found.");
+        return;
+    }
+
+    const threadId: string = threadData.value.uuid;
+    const title: string = threadData.value.title;
+    const postDataList: Deno.KvListIterator<PostModel> = kv.list({ prefix: [threadId] });
+
+    let postList: string = "";
+    for await (const postData of postDataList) {
+        postList += `${postData.value.userName}: ${postData.value.post}\n`;
+    }
+
+    const body = JSON.stringify({
+        contents: [
+            {
+                parts: [
+                    {
+                        text:
+                            `今から提示するスレッド内の会話を300字の誤差10文字以内で要約してください。
+                            要約するときの文章は、新聞と同じような構成でお願いします。
+                            見出しは不要なので、本文のみを生成してください。
+                            段落分けは改行のみで、スペースを入れないようにしてください。
+                            "名無し"は名前が存在しない人の名前です。
+
+                            ## 記事見出し: ${title}
+                            ${postList}`,
+                    },
+                ],
+            },
+        ],
+    });
+
+    try {
+        const response = await fetch(`${API_URL}?key=${API_KEY}`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: body,
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(
+                `API request failed: ${response.status} ${response.statusText} - ${
+                    JSON.stringify(errorData)
+                }`,
+            );
+        }
+
+        const data = await response.json();
+        const summary: string = data.candidates[0].content.parts[0].text;
+        const selectedThread: ThreadModel = {
+            "uuid": threadId,
+            "title": title,
+            "summary": summary,
+            "enable": false,
+        };
+
+        await kv.set([newspaperId, index], selectedThread);
+        if (await checkAndChangeNewspaperStatus(newspaperId, kv)) {
+            console.log("newspaper is created");
+        }
+        return selectedThread;
+    } catch (error) {
+        console.error("An error occurred:", error);
+        return error;
+    }
+};
 
 const createThreadSummary = async (ctx: Context) => {
     const API_KEY: string | undefined = Deno.env.get("GOOGLE_API_KEY");
@@ -19,7 +126,6 @@ const createThreadSummary = async (ctx: Context) => {
     }
     const index: number = Number(indexStr);
 
-    const kv: Deno.Kv = await Deno.openKv();
     const threadData: Deno.KvEntryMaybe<ThreadModel> = await kv.get([newspaperId, index]);
 
     if (!threadData.value) {
@@ -97,7 +203,6 @@ const getThreadSummaryList = async (ctx: Context) => {
         return ctx.text("Missing newspaper-id parameter", 400);
     }
 
-    const kv: Deno.Kv = await Deno.openKv();
     const newspaper: Deno.KvEntryMaybe<NewspaperModel> = await kv.get<NewspaperModel>([
         "newspaper",
         newspaperId,
@@ -130,4 +235,4 @@ const getThreadSummaryList = async (ctx: Context) => {
     });
 };
 
-export { createThreadSummary, getThreadSummaryList };
+export { createThreadSummary, generateSummary, getThreadSummaryList };

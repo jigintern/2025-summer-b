@@ -1,11 +1,11 @@
 import { Context } from "https://deno.land/x/hono@v4.3.11/mod.ts";
 import { ThreadModel } from "./models.ts";
 import { getWebSocketThreadPosts, postAndGetUserPost } from "./threadContent.ts";
+import kv from "./lib/kv.ts";
 
 const threadSockets = new Map<string, Set<WebSocket>>();
 
 const getThreadData = async (ws: WebSocket, newspaperId: string, index: number) => {
-    const kv: Deno.Kv = await Deno.openKv();
     const threadData: Deno.KvEntryMaybe<ThreadModel> = await kv.get<ThreadModel>([
         newspaperId,
         index,

@@ -1,6 +1,7 @@
 import { DateStringNewspaperModel, NewspaperModel } from "./models.ts";
 import { UUID } from "npm:uuidjs";
 import { Context } from "https://deno.land/x/hono@v4.3.11/mod.ts";
+import kv from "./lib/kv.ts";
 
 function convertToSamplePost(date: Date): string {
     const createdAt: Date = new Date(date);
@@ -25,9 +26,6 @@ function convertToSamplePost(date: Date): string {
 }
 
 const getNewspaperList = async (ctx: Context) => {
-    // Deno KVにアクセス
-    const kv: Deno.Kv = await Deno.openKv();
-
     // list: 条件指定の取得
     const newspapers: Deno.KvListIterator<NewspaperModel> = kv.list({
         prefix: ["newspaper"],
@@ -58,9 +56,6 @@ const getNewspaperList = async (ctx: Context) => {
 };
 
 const createNewspapersData = async (ctx: Context) => {
-    // Deno KVにアクセス
-    const kv: Deno.Kv = await Deno.openKv();
-
     let newspaperUUID: string;
     let count: number = 0;
 
