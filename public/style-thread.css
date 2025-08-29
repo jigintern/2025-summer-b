@@ -224,7 +224,7 @@ button:disabled {
     }
 
     .content-container {
-        top: 12%; /* スマホでヘッダーが小さくなる分調整 */
+        top: 20%; /* スマホでヘッダーが小さくなる分調整 */
         bottom: 33%; /* スマホでは入力フォームがより高いため余白を増やす */
         padding: 15px;
     }
