@@ -141,24 +141,40 @@ const createThreadSummary = async (ctx: Context) => {
         postList += `${postData.value.userName}: ${postData.value.post}\n`;
     }
 
+    const system_prompt =
+        `あなたはプロの編集者です。与えられた指示を絶対的なルールとして厳守してください。
+
+# 最重要ルール
+- **生成する文章は、句読点を含めて絶対に250文字を超えてはいけません。** このルールが最優先です。
+
+# ルール
+- 見出しは不要で、本文のみを生成します。
+- 段落分けは、空白を入れず、改行のみで行います。
+- **スレッドの内容を面白おかしく解説してください。内容は、会話の内容に沿ったものにしてください。**`;
+
+    const user_input = `## 記事見出し: ${title}
+${postList}`;
+
     const body = JSON.stringify({
         contents: [
             {
                 parts: [
                     {
-                        text:
-                            `今から提示するスレッド内の会話を300字の誤差10文字以内で要約してください。
-                            要約するときの文章は、新聞と同じような構成でお願いします。
-                            見出しは不要なので、本文のみを生成してください。
-                            記事に改行は含まないでください。
-                            "名無し"は名前が存在しない人の名前です。
-
-                            ## 記事見出し: ${title}
-                            ${postList}`,
+                        text: user_input,
                     },
                 ],
             },
         ],
+        systemInstruction: {
+            parts: [
+                {
+                    text: system_prompt,
+                },
+            ],
+        },
+        generationConfig: {
+            "maxOutputTokens": 130,
+        },
     });
 
     try {
