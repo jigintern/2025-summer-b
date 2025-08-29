@@ -8,6 +8,9 @@
     li.bbs,
     li.newspaper {
         font-size: 20px !important;
+        margin: 10px !important;
+        text-overflow: ellipsis !important;
+        white-space: nowrap !important;
     }
 }
 
