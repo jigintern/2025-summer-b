@@ -132,6 +132,11 @@ body {
     }
 }
 
+p {
+    height: 100%;
+    width: 100%;
+}
+
 .title-container {
     grid-area: 1 / 5 / 7 / 7;
     display: grid;
