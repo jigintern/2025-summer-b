@@ -39,6 +39,7 @@ span.kirakira {
     justify-content: space-around;
     gap:20px;
     margin-top: 64px;
+    height: 80%; 
 }
 
 .bbs-container,
