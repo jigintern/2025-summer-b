@@ -1,6 +1,7 @@
 import { FormatDatePostModel, PostModel, RegisterPostModel, ThreadModel } from "./models.ts";
 import { Context } from "https://deno.land/x/hono@v4.3.11/mod.ts";
 import samplePosts from "./data/samplePosts.json" with { type: "json" };
+import kv from "./lib/kv.ts";
 
 function convertToSamplePost(postModel: PostModel): FormatDatePostModel {
     const createdAt: Date = new Date(postModel.createdAt);
@@ -46,7 +47,6 @@ const getThreadPosts = async (ctx: Context) => {
         return ctx.text("Missing thread-id parameter", 400);
     }
 
-    const kv: Deno.Kv = await Deno.openKv();
     const postList: Deno.KvListIterator<PostModel> = await kv.list({ prefix: [threadId] });
     const threadPosts: FormatDatePostModel[] = [];
     for await (const post of postList) {
@@ -87,16 +87,6 @@ const registerThreadPosts = async (ctx: Context) => {
         });
     }
 
-    const kv: Deno.Kv = await Deno.openKv();
-
-    // const threadData: Deno.KvEntryMaybe<ThreadModel> = await kv.get([
-    //     newspaperId,
-    //     threadIndex,
-    // ]);
-    // if (!threadData.value) {
-    //     throw ctx.text("thread data is not found.");
-    // }
-
     const posts: Deno.KvListIterator<PostModel> = kv.list({ prefix: [threadId] });
     let postsLength: number = 0;
     for await (const _ of posts) postsLength++;
@@ -117,7 +107,7 @@ const registerThreadPosts = async (ctx: Context) => {
         if (!threadData.value) {
             throw ctx.json({ "text": "thread data is not found.", "enoughPosts": false });
         }
-        const newThreadData = { ...threadData.value, "enable": false };
+        const newThreadData: ThreadModel = { ...threadData.value, "enable": false };
         await kv.set([newspaperId, threadIndex], newThreadData);
         enoughPosts = true;
     }
@@ -136,7 +126,6 @@ const createThreadPosts = async (ctx: Context) => {
     }
     const index: number = Number(indexStr);
 
-    const kv: Deno.Kv = await Deno.openKv();
     const threadData: Deno.KvEntryMaybe<ThreadModel> = await kv.get([
         newspaperId,
         index,
@@ -146,7 +135,7 @@ const createThreadPosts = async (ctx: Context) => {
         return ctx.text("thread data is not found.", 404);
     }
 
-    const newThreadData = { ...threadData.value, "title": "オイルショック" };
+    const newThreadData: ThreadModel = { ...threadData.value, "title": "オイルショック" };
     await kv.set([newspaperId, index], newThreadData);
 
     const posts: PostModel[] = convertSamplePostsToPostModels(samplePosts as FormatDatePostModel[]);
@@ -158,7 +147,6 @@ const createThreadPosts = async (ctx: Context) => {
 };
 
 const getWebSocketThreadPosts = async (threadId: string) => {
-    const kv: Deno.Kv = await Deno.openKv();
     const postList: Deno.KvListIterator<PostModel> = await kv.list({ prefix: [threadId] });
     const threadPosts: FormatDatePostModel[] = [];
     for await (const post of postList) {
@@ -187,8 +175,7 @@ const checkIsReachedTheLimit = async (
     postListLength: number,
     limit_post_number: number,
 ) => {
-    if (postListLength >= limit_post_number + 1) {
-        const kv: Deno.Kv = await Deno.openKv();
+    if (postListLength + 1 >= limit_post_number) {
         const threadData: Deno.KvEntryMaybe<ThreadModel> = await kv.get([
             newspaperId,
             threadIndex,
@@ -196,9 +183,9 @@ const checkIsReachedTheLimit = async (
         if (!threadData.value) {
             return null;
         }
-        const newThreadData = { ...threadData.value, enable: false };
+        const newThreadData: ThreadModel = { ...threadData.value, enable: false };
         await kv.set([newspaperId, threadIndex], newThreadData);
-        return true;
+        return postListLength + 1 === limit_post_number ? false : true;
     } else {
         return false;
     }
@@ -222,8 +209,6 @@ const postAndGetUserPost = async (
         }));
         return;
     }
-
-    const kv: Deno.Kv = await Deno.openKv();
 
     const threadPostList: FormatDatePostModel[] = await getWebSocketThreadPosts(threadId);
     const postsLength: number = threadPostList.length;
@@ -252,6 +237,16 @@ const postAndGetUserPost = async (
         createdAt: createdAt,
     };
     await kv.set([threadId, postsLength], post);
+
+    if (postsLength + 1 >= LIMIT_POST_NUMBER) {
+        await kv.enqueue({
+            type: "summarize",
+            payload: { newspaperId: newspaperId, index: threadIndex },
+        });
+        console.log(
+            `要約タスクをキューに追加しました: newspaperId=${newspaperId}, index=${threadIndex}`,
+        );
+    }
 
     for (const socket of sockets) {
         socket.send(

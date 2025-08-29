@@ -23,23 +23,23 @@
                 </div>
                 <div class="article-container-1">
                     <div class="article-1-content article-body clickable-article"></div>
-                    <div class="article-1-title headline"></div>
+                    <a class="article-1-title headline"></a>
                 </div>
                 <div class="article-container-2">
                     <div class="article-2-content article-body clickable-article"></div>
-                    <div class="article-2-title headline"></div>
+                    <a class="article-2-title headline"></a>
                 </div>
                 <div class="article-container-3">
                     <div class="article-3-content article-body clickable-article"></div>
-                    <div class="article-3-title headline"></div>
+                    <a class="article-3-title headline"></a>
                 </div>
                 <div class="article-container-4">
                     <div class="article-4-content article-body clickable-article"></div>
-                    <div class="article-4-title headline"></div>
+                    <a class="article-4-title headline"></a>
                 </div>
                 <div class="article-container-5">
                     <div class="article-5-content article-body clickable-article"></div>
-                    <div class="article-5-title headline"></div>
+                    <a class="article-5-title headline"></a>
                 </div>
             </div>
 
@@ -59,9 +59,6 @@
         const queryString = window.location.search;
         const params = new URLSearchParams(queryString);
         const newspaperId = params.get("newspaper-id");
-
-        const testDate = "2025年8月25日（月）";
-        let testContents = [];
 
         document.addEventListener("DOMContentLoaded", async () => {
             const modal = document.getElementById("articleModal");
@@ -84,16 +81,13 @@
                 const contentsList = responseToJson.map((contents) => ({
                     title: contents.title,
                     summary: contents.summary ?? "null",
+                    threadId: contents.threadId,
                 }));
-                // 配列の内容を順に表示
-                if (contentsList) {
-                    testContents = contentsList;
-                }
 
                 for (let i = 0; i < articleBodyList.length; i++) {
                     articleBodyList[i].textContent = "";
 
-                    const lines = testContents[i].summary.split("\n").filter((line) =>
+                    const lines = contentsList[i].summary.split("\n").filter((line) =>
                         line.trim() !== ""
                     );
 
@@ -105,16 +99,18 @@
                 }
 
                 for (let i = 0; i < articleHeadlineList.length; i++) {
-                    articleHeadlineList[i].textContent = testContents[i].title;
+                    articleHeadlineList[i].textContent = contentsList[i].title;
+                    articleHeadlineList[i].href =
+                        `/thread?newspaper-id=${newspaperId}&index=${i}&thread-id=${
+                            contentsList[i].threadId
+                        }`;
                 }
 
                 // 記事クリック時の処理
                 for (let i = 0; i < clickableArticles.length; i++) {
                     clickableArticles[i].addEventListener("click", function () {
-                        const title = testContents[i].title;
-                        const content = testContents[i].summary.split("\n").filter((
-                            line,
-                        ) => line.trim() !== "");
+                        const title = contentsList[i].title;
+                        const content = contentsList[i].summary;
 
                         modalTitle.textContent = title;
                         modalContent.textContent = content;
@@ -129,12 +125,26 @@
                     `?newspaper-id=${newspaperId}`;
                 const response = await fetch(endpoint);
                 const responseToJson = await response.json();
-                renderContents(responseToJson);
+                console.log(responseToJson);
+                renderContents(responseToJson.threads);
+                const dateString = responseToJson.newspaper.createdAt;
+                // date.textContent = responseToJson.newspaper.createdAt || "日付無し";
+                if (!dateString) {
+                    date.textContent = "日付無し";
+                } else {
+                    const createdDate = new Date(dateString);
+                    date.innerText = `${createdDate.getFullYear()}年 ${
+                        (createdDate.getMonth() + 1).toString().padStart(2, " ")
+                    }月${createdDate.getDate().toString().padStart(2, " ")}日\n(${
+                        ["日", "月", "火", "水", "木", "金", "土"][createdDate.getDay()]
+                    }曜日)`;
+
+                    // --- 実行例 ---
+                }
             } catch (e) {
                 console.log("error: ", e);
             }
 
-            date.textContent = testDate;
             // 閉じるボタンクリック時の処理
             closeBtn.addEventListener("click", function () {
                 modal.style.display = "none";

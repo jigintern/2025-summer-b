@@ -1,16 +1,13 @@
 import { NewspaperModel, ThreadModel } from "./models.ts";
 import { UUID } from "npm:uuidjs";
 import { Context } from "https://deno.land/x/hono@v4.3.11/mod.ts";
-
 import newsList from "./data/news.json" with { type: "json" };
+import kv from "./lib/kv.ts";
 
 const shuffleArray = (arr: string[]) => arr.sort(() => Math.random() - Math.random());
 
 const getThreadTitles = async (ctx: Context) => {
     const shuffled: string[] = shuffleArray(newsList.titles);
-
-    // Deno KVにアクセス
-    const kv: Deno.Kv = await Deno.openKv();
 
     const threadList: ThreadModel[] = [];
 
