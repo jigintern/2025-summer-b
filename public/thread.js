@@ -19,6 +19,7 @@ const closeThread = () => {
     userNameInput.disabled = true;
     postContentInput.disabled = true;
     submitBtn.disabled = true;
+    postContentInput.placeholder = "このスレッドはCloseされています。";
     const closeDiv = document.createElement("div");
     closeDiv.textContent = "(Close済み)";
     titleElement.appendChild(closeDiv);
