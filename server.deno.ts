@@ -2,6 +2,7 @@ import { Hono } from "https://deno.land/x/hono@v4.3.11/mod.ts";
 import { logger, serveStatic } from "https://deno.land/x/hono@v4.3.11/middleware.ts";
 import { getThreadTitles } from "./api/threadList.ts";
 import { createThreadPosts, getThreadPosts, registerThreadPosts } from "./api/threadContent.ts";
+import { createThreadPostSuggest } from "./api/createThreadPostSuggest.js";
 import { createNewspapersData, getNewspaperList } from "./api/newspaperList.ts";
 import {
     createThreadSummary,
@@ -45,6 +46,13 @@ app.get("/new-posts", registerThreadPosts);
 @param index - ダミー投稿を作成したいスレッドの新聞内のスレッド番号(リストの順番)(0 ~ 4)
  */
 app.get("/create-posts", createThreadPosts);
+
+/**
+@description AI投稿案を作成するAPI
+@param title - タイトル
+@param body - 既存の投稿リスト
+ */
+app.post("/create-post-suggest", createThreadPostSuggest);
 
 /**
 @description スレッドの投稿内容を新聞の記事風に要約生成するAPI
@@ -118,4 +126,9 @@ app.get(
     }),
 );
 
-Deno.serve(app.fetch);
+const portEnv = Deno.env.get("PORT");
+if (!portEnv) {
+    throw new Error("PORT environment variable is not set.");
+}
+const port = parseInt(portEnv);
+Deno.serve({ port }, app.fetch);

@@ -121,8 +121,10 @@
             };
 
             try {
-                const endpoint = `/get-summary` +
-                    `?newspaper-id=${newspaperId}`;
+                const endpoint = newspaperId
+                    ? `/get-summary` +
+                        `?newspaper-id=${newspaperId}`
+                    : decodeURIComponent(params.get("url"));
                 const response = await fetch(endpoint);
                 const responseToJson = await response.json();
                 console.log(responseToJson);
