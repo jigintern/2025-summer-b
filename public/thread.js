@@ -186,3 +186,43 @@ postContentInput.addEventListener("keydown", (e) => {
         sendFnc();
     }
 });
+
+const getPrompt = (type, title, body) => {
+    const ss = [];
+    if (type == "suggest") {
+        ss.push(`今から提示する掲示板にスレッド内の意見と被らない1人分の投稿を匿名掲示板らしく砕けた表現で、2行以内の名前を含まない本文のみで記述してください。`);
+    } else if (type == "agree" || type == "disagree") {
+        const aord = type == "agree" ? "同意的な" : "批判的だけど発展的な";
+        ss.push(`今から提示する掲示板のスレッド内の流れに対して${aord}1人分の投稿を、匿名掲示板らしく砕けた表現で、2行以内の本文のみで記述してください。`);
+    }
+    ss.push(`スレッド内の名前"名無し"は名前が存在しない人の名前です。
+
+## スレッドのタイトル: ${title}
+${body}`);
+    return ss.join("\n");
+};
+
+const aiSuggest = async (type) => {
+    const title = titleElement.textContent;
+    const contents = postsContainer.querySelectorAll(".user,.content");
+    const list = [];
+    for (let i = 0; i < contents.length; i += 2) {
+        list.push(contents[i].textContent + ": " + contents[i + 1].textContent);
+    }
+    const body = list.join("\n");
+    
+    const prompt = getPrompt(type, title, body);
+    if (!prompt) throw new Error("no prompt");
+    const response = await fetch("/create-post-suggest", {
+        method: "POST",
+        "Content-Type": "application/json",
+        body: JSON.stringify({ prompt }),
+    });
+    const res = await response.json();
+    console.log(res);
+    postContentInput.value = res;
+};
+
+suggestBtn.onclick = async () => await aiSuggest("suggest");
+agreeBtn.onclick = async () => await aiSuggest("agree");
+disagreeBtn.onclick = async () => await aiSuggest("disagree");
