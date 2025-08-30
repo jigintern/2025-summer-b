@@ -126,5 +126,9 @@ app.get(
     }),
 );
 
-const port = parseInt(Deno.env.get("PORT"));
+const portEnv = Deno.env.get("PORT");
+if (!portEnv) {
+    throw new Error("PORT environment variable is not set.");
+}
+const port = parseInt(portEnv);
 Deno.serve({ port }, app.fetch);

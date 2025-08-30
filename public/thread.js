@@ -190,10 +190,14 @@ postContentInput.addEventListener("keydown", (e) => {
 const getPrompt = (type, title, body) => {
     const ss = [];
     if (type == "suggest") {
-        ss.push(`今から提示する掲示板にスレッド内の意見と被らない1人分の投稿を匿名掲示板らしく砕けた表現で、2行以内の名前を含まない本文のみで記述してください。`);
+        ss.push(
+            `今から提示する掲示板にスレッド内の意見と被らない1人分の投稿を匿名掲示板らしく砕けた表現で、2行以内の名前を含まない本文のみで記述してください。`,
+        );
     } else if (type == "agree" || type == "disagree") {
         const aord = type == "agree" ? "同意的な" : "批判的だけど発展的な";
-        ss.push(`今から提示する掲示板のスレッド内の流れに対して${aord}1人分の投稿を、匿名掲示板らしく砕けた表現で、2行以内の本文のみで記述してください。`);
+        ss.push(
+            `今から提示する掲示板のスレッド内の流れに対して${aord}1人分の投稿を、匿名掲示板らしく砕けた表現で、2行以内の本文のみで記述してください。`,
+        );
     }
     ss.push(`スレッド内の名前"名無し"は名前が存在しない人の名前です。
 
@@ -210,7 +214,7 @@ const aiSuggest = async (type) => {
         list.push(contents[i].textContent + ": " + contents[i + 1].textContent);
     }
     const body = list.join("\n");
-    
+
     const prompt = getPrompt(type, title, body);
     if (!prompt) throw new Error("no prompt");
     const response = await fetch("/create-post-suggest", {

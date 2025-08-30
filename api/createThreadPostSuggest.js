@@ -3,7 +3,8 @@ const fetchAI = async (prompt) => {
     if (!API_KEY) throw new Error("no GOOGLE_API_KEY on Deno.env");
     //const model = "gemini-2.5-flash";
     const model = "gemini-2.5-flash-lite";
-    const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`;
+    const API_URL =
+        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`;
 
     const body = JSON.stringify({
         contents: [
